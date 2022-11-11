@@ -11,6 +11,12 @@ def home(request):
 def landing_page(request):
     return render(request, 'landing_page.html')
 
+def lessons(request):
+    return render(request, 'lessons.html')
+
+def payment(request):
+    return render(request, 'payment.html')
+
 def sign_up(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)

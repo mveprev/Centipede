@@ -4,7 +4,7 @@ from django import forms
 from .models import Student
 
 class LogInForm(forms.Form):
-    email = forms.CharField(label='Email', validators=[validate_email])
+    email = forms.CharField(label='Email')
     password = forms.CharField(label='Password', widget=forms.PasswordInput())
 
 class SignUpForm(forms.ModelForm):
