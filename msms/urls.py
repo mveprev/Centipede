@@ -23,7 +23,10 @@ urlpatterns = [
     path('log_in/', views.log_in, name = 'log_in'),
     path('log_out/', views.log_out, name='log_out'),
     path('sign_up/', views.sign_up, name = 'sign_up'),
-    path('landing_page/', views.landing_page, name = 'landing_page'),
-    path('lessons/', views.lessons, name = 'lessons'),
-    path('payment/', views.payment, name = 'payment'),
+    path('student_landing_page/', views.student_landing_page, name = 'student_landing_page'),
+    path('student_lessons/', views.student_lessons, name = 'student_lessons'),
+    path('student_payment/', views.student_payment, name = 'student_payment'),
+    path('admin_landing_page/', views.admin_landing_page, name = 'admin_landing_page'),
+    path('admin_lessons/', views.admin_lessons, name = 'admin_lessons'),
+    path('admin_payment/', views.admin_payment, name = 'admin_payment'),
 ]

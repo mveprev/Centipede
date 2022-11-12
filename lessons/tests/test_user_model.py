@@ -1,12 +1,12 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from lessons.models import Student
+from lessons.models import User
 
 class UserModelTestCase(TestCase):
     '''Unit test for the User model'''
 
     def setUp(self):
-        self.user = Student.objects.create_user(
+        self.user = User.objects.create_user(
             first_name = 'John',
             last_name = 'Doe',
             email = 'james@example.org',
@@ -86,7 +86,7 @@ class UserModelTestCase(TestCase):
             self.user.full_clean()
 
     def create_second_user(self):
-        user = Student.objects.create_user(
+        user = User.objects.create_user(
             first_name = 'Jane',
             last_name = 'Li',
             email = 'jane@example.org',

@@ -8,14 +8,23 @@ from .forms import SignUpForm, LogInForm
 def home(request):
     return render(request,'home.html')
 
-def landing_page(request):
-    return render(request, 'landing_page.html')
+def student_landing_page(request):
+    return render(request, 'student_landing_page.html')
 
-def lessons(request):
-    return render(request, 'lessons.html')
+def student_lessons(request):
+    return render(request, 'student_lessons.html')
 
-def payment(request):
-    return render(request, 'payment.html')
+def student_payment(request):
+    return render(request, 'student_payment.html')
+
+def admin_landing_page(request):
+    return render(request, 'admin_landing_page.html')
+
+def admin_lessons(request):
+    return render(request, 'admin_lessons.html')
+
+def admin_payment(request):
+    return render(request, 'admin_payment.html')
 
 def sign_up(request):
     if request.method == 'POST':
@@ -23,7 +32,7 @@ def sign_up(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            return redirect('landing_page')
+            return redirect('student_landing_page')
     else:
         form = SignUpForm()
     return render(request, 'sign_up.html', {'form': form})
@@ -36,8 +45,11 @@ def log_in(request):
             password = form.cleaned_data.get('password')
             user = authenticate(email=email, password=password)
             if user is not None:
+                if user.is_staff:
+                    login(request, user)
+                    return redirect('admin_landing_page')
                 login(request, user)
-                return redirect('landing_page')
+                return redirect('student_landing_page')
         #Add error message here
         messages.add_message(request, messages.ERROR, "The credentials provided were invalid")
     form = LogInForm()
