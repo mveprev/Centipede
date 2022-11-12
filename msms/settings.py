@@ -130,7 +130,7 @@ STATICFILES_DIRS = [
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # User model for authentication purposes
-AUTH_USER_MODEL = 'lessons.Student'
+AUTH_USER_MODEL = 'lessons.User'
 
 # Message level tags should use Bootstrap terms
 MESSAGE_TAGS = {

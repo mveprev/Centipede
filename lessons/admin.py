@@ -1,8 +1,8 @@
 from django.contrib import admin
-from .models import Student
+from .models import User
 
 # Register your models here.
-@admin.register(Student)
+@admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     """Configuration fo the admin interface for users."""
     list_display = [

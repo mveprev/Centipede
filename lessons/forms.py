@@ -1,7 +1,7 @@
 from django.core.validators import validate_email
 from django.core.validators import RegexValidator
 from django import forms
-from .models import Student
+from .models import User
 
 class LogInForm(forms.Form):
     email = forms.CharField(label='Email')
@@ -9,7 +9,7 @@ class LogInForm(forms.Form):
 
 class SignUpForm(forms.ModelForm):
     class Meta:
-        model = Student
+        model = User
         fields = ['first_name','last_name']
 
     email = forms.CharField(label='Email', validators=[validate_email])
@@ -32,10 +32,10 @@ class SignUpForm(forms.ModelForm):
 
     def save(self):
         super().save(commit=False)
-        student = Student.objects.create_user(
+        user = User.objects.create_user(
             self.cleaned_data.get('email'),
             first_name = self.cleaned_data.get('first_name'),
             last_name = self.cleaned_data.get('last_name'),
             password = self.cleaned_data.get('new_password')
         )
-        return student
+        return user

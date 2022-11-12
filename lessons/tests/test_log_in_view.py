@@ -2,14 +2,14 @@ from django.contrib import messages
 from django.test import TestCase
 from django.urls import reverse
 from lessons.forms import LogInForm
-from lessons.models import Student
+from lessons.models import User
 from .helpers import LogInTester
 
 class LogInViewTestCase(TestCase, LogInTester):
 
     def setUp(self):
         self.url = reverse('log_in')
-        self.user = Student.objects.create_user(
+        self.user = User.objects.create_user(
             email = 'james@example.org',
             first_name='James',
             last_name = 'Lu',
@@ -46,9 +46,9 @@ class LogInViewTestCase(TestCase, LogInTester):
         form_input = {'email':'james@example.org', 'password':'Lu123'}
         response = self.client.post(self.url, form_input, follow=True)
         self.assertTrue(self._is_logged_in())
-        response_url = reverse('landing_page')
+        response_url = reverse('student_landing_page')
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
-        self.assertTemplateUsed(response, 'landing_page.html')
+        self.assertTemplateUsed(response, 'student_landing_page.html')
         messages_list = list(response.context['messages'])
         self.assertEqual(len(messages_list),0)
 
