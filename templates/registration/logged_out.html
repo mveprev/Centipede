@@ -1,0 +1,14 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block nav-sidebar %}{% endblock %}
+
+{% block content %}
+
+<p>{% translate "You have logged out of the Music School Director System" %}</p>
+
+<p><a href="{% url 'home' %}">{% translate 'Back to the Music School Home Page' %}</a></p>
+
+{% endblock %}
