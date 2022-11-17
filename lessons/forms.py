@@ -49,11 +49,13 @@ class LessonForm(forms.ModelForm):
         fields = ('lessons','availability','desiredInterval','duration','furtherInfo','id')
 
     INTERVAL_CHOICES= [
+    ('',''),
     ('1', '1 LESSON EVERY 2 WEEK'),
     ('2', '1 LESSON EVERY 2 WEEKS'),
     ]
 
     DURATION_CHOICES= [
+    ('',''),
     ('30', '30'),
     ('45', '45'),
     ('60', '60'),

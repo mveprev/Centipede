@@ -17,6 +17,7 @@ def student_landing_page(request):
             lesson = form.save(commit=False)
             lesson.user=request.user
             lesson.save()
+            return redirect('student_landing_page')
     else:
         form = LessonForm()
     return render(request, 'student_landing_page.html',{'form': form})
