@@ -51,12 +51,13 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     objects = UserManager()
     USERNAME_FIELD = 'email'
-    
+
 class Lesson(models.Model):
     availability = models.IntegerField(blank=False)
     lessons = models.IntegerField(blank=False)
     desiredInterval = models.IntegerField(blank=False)
     duration = models.IntegerField(blank=False)
     furtherInfo = models.TextField(blank=False)
+    id = models.AutoField(primary_key=True, unique=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 

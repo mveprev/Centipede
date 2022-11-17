@@ -42,11 +42,11 @@ class SignUpForm(forms.ModelForm):
             password = self.cleaned_data.get('new_password')
         )
         return user
-        
+
 class LessonForm(forms.ModelForm):
     class Meta:
         model = Lesson
-        fields = ('lessons','availability','desiredInterval','duration','furtherInfo',)
+        fields = ('lessons','availability','desiredInterval','duration','furtherInfo','id')
 
     INTERVAL_CHOICES= [
     ('1', '1 LESSON EVERY 2 WEEK'),
