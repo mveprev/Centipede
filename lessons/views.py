@@ -1,15 +1,25 @@
+from django.views.generic import TemplateView
 from django.core.validators import validate_email
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import redirect,render
-from .forms import SignUpForm, LogInForm
+from .forms import SignUpForm, LogInForm, LessonForm
+from .models import Lesson
 
 # Create your views here.
 def home(request):
     return render(request,'home.html')
 
 def student_landing_page(request):
-    return render(request, 'student_landing_page.html')
+    if request.method == "POST":
+        form = LessonForm(request.POST)
+        if form.is_valid():
+            lesson = form.save(commit=False)
+            lesson.user=request.user
+            lesson.save()
+    else:
+        form = LessonForm()
+    return render(request, 'student_landing_page.html',{'form': form})
 
 def student_lessons(request):
     return render(request, 'student_lessons.html')
@@ -58,3 +68,9 @@ def log_in(request):
 def log_out(request):
     logout(request)
     return redirect('home')
+
+
+
+
+
+

@@ -1,7 +1,7 @@
 from django.db import models
 
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
-from django.contrib.auth.models import PermissionsMixin
+from django.contrib.auth.models import PermissionsMixin, User
 from msms import settings
 # Create your models here.
 
@@ -51,3 +51,12 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     objects = UserManager()
     USERNAME_FIELD = 'email'
+    
+class Lesson(models.Model):
+    availability = models.IntegerField(blank=False)
+    lessons = models.IntegerField(blank=False)
+    desiredInterval = models.IntegerField(blank=False)
+    duration = models.IntegerField(blank=False)
+    furtherInfo = models.TextField(blank=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
