@@ -48,6 +48,7 @@ class Command(BaseCommand):
 
 # Function to create and input the dummy data.
 
+
     def handle(self, *args, **options):
         # print("The seed command has not been implemented yet!")
         # print("TO DO: Create a seed command following the instructions of the assignment carefully.")
@@ -57,8 +58,7 @@ class Command(BaseCommand):
         # print(self.faker.music_school_instruments())
 
         password_data = make_password('Password123')
-        password_data_general = make_password(self.faker.password(
-            length=11, special_chars=True, upper_case=True))
+
         User.objects.create(email="john.doe@example.org", password=password_data, first_name="John",
                             last_name="Doe")
         User.objects.create(email="petra.pickles@example.org", password=password_data,
@@ -67,6 +67,10 @@ class Command(BaseCommand):
                             last_name="Major", is_staff=True, is_superuser=True)
 
         for _ in range(0, 97):
+
+            password_data_general = self.faker.password(
+                length=11, special_chars=True, upper_case=True)
+
             first_name = self.faker.first_name()
             last_name = self.faker.last_name()
             email = first_name.lower() + "-" + last_name.lower() + \
