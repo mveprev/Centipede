@@ -5,6 +5,7 @@ from django.contrib.auth.models import PermissionsMixin
 from msms import settings
 # Create your models here.
 
+
 class UserManager(BaseUserManager):
 
     use_in_migrations = True
@@ -37,18 +38,20 @@ class UserManager(BaseUserManager):
             )
         return self._create_user(email, password, **extra_fields)
 
+
 class User(AbstractBaseUser, PermissionsMixin):
 
     email = models.EmailField(
-        unique = True,
-        max_length = 50,
-        blank = False,
+        unique=True,
+        max_length=50,
+        blank=False,
     )
-    first_name = models.CharField(max_length=50,blank=False)
-    last_name = models.CharField(max_length=50,blank = False)
-    is_staff = models.BooleanField(default=False, verbose_name = 'administrator')
-    is_superuser = models.BooleanField(default=False, verbose_name = 'director')
-    is_active = models.BooleanField(default=True, verbose_name = 'active')
+
+    first_name = models.CharField(max_length=50, blank=False)
+    last_name = models.CharField(max_length=50, blank=False)
+    is_staff = models.BooleanField(default=False, verbose_name='administrator')
+    is_superuser = models.BooleanField(default=False, verbose_name='director')
+    is_active = models.BooleanField(default=True, verbose_name='active')
 
     objects = UserManager()
     USERNAME_FIELD = 'email'
