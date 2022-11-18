@@ -29,4 +29,6 @@ urlpatterns = [
     path('admin_landing_page/', views.admin_landing_page, name = 'admin_landing_page'),
     path('admin_lessons/', views.admin_lessons, name = 'admin_lessons'),
     path('admin_payment/', views.admin_payment, name = 'admin_payment'),
+    path('delete_lesson/<lessonId>', views.delete_lesson, name= 'delete-lesson'),
+    path('edit_lesson/<lessonId>', views.edit_lesson, name='edit-lesson')
 ]
