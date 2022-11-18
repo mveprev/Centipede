@@ -2,17 +2,62 @@ from django.core.validators import validate_email
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import redirect,render
-from .forms import SignUpForm, LogInForm
+from .forms import SignUpForm, LogInForm, LessonForm
+from .models import User, Lesson
 
 # Create your views here.
 def home(request):
     return render(request,'home.html')
 
 def student_landing_page(request):
-    return render(request, 'student_landing_page.html')
+    if request.method == "POST":
+        form = LessonForm(request.POST)
+        if form.is_valid():
+            lesson = form.save(commit=False)
+            lesson.user=request.user
+            lesson.save()
+            return redirect('student_landing_page')
+    else:
+        form = LessonForm()
+    return render(request, 'student_landing_page.html',{'form': form})
 
+'''Checks if the user is logged in.If not, 
+sends them back to the home page.If they are, 
+all of their lessons are assigned to lesson 
+list and then sends them to the lesson page'''
 def student_lessons(request):
-    return render(request, 'student_lessons.html')
+    if request.user.is_authenticated:
+        currentUser = request.user
+        lessonsList = Lesson.objects.filter(user=currentUser)
+        return render(request, 'student_lessons.html', {'student_lessons':lessonsList})
+    else:
+        return render(request,'home.html')
+
+#Delete a lessons
+def delete_lesson(request, lessonId):
+    lesson = Lesson.objects.get(id=lessonId)
+    lesson.delete()
+    if request.user.is_authenticated:
+        currentUser = request.user
+        lessonsList = Lesson.objects.filter(user=currentUser)
+        return render(request, 'student_lessons.html', {'student_lessons':lessonsList})
+    else:
+        return render(request,'home.html')
+        
+#Edits lessons
+def edit_lesson(request, lessonId):
+    lesson = Lesson.objects.get(id=lessonId)
+    form = LessonForm(request.POST or None, instance = lesson)
+    if form.is_valid():
+        lesson = form.save(commit=False)
+        lesson.user=request.user
+        lesson.save()
+        currentUser = request.user
+        lessonsList = Lesson.objects.filter(user=currentUser)
+        return render(request, 'student_lessons.html', {'student_lessons':lessonsList})
+    return render(request, 'update_lessons.html', 
+    {'lesson':lesson,
+    'form':form})
 
 def student_payment(request):
     return render(request, 'student_payment.html')

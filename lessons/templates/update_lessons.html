@@ -1,0 +1,16 @@
+{% extends 'student_base_content.html' %}
+{% block student_content %}
+<div class='container'>
+    <div class='row'>
+        <div class='col-sm-12 col-md-6 offset-md-3'>
+            <h1>Page to edit lessons</h1>
+            <p><b>
+              <form action="" method=POST>
+              {% csrf_token %}
+              {{form.as_p}}
+            </b></p>
+            <input class="btn btn-primary" type="submit" value="Submit">
+        </div>
+    </div>
+</div>
+{% endblock %}
