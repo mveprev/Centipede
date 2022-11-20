@@ -1,0 +1,36 @@
+{% extends 'student_base_content.html' %}
+{% block student_content %}
+<div class='container'>
+    <div class='row'>
+        <div class='col-sm-12 col-md-6 offset-md-3'>
+            <h1>My children</h1>
+            <p><b>UNDER CONSTRUCTION</b>: In this page user can edit childrens.</p>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">First name</th>
+                  <th scope="col">Last name</th>
+                  <th scope="col">Age</th>
+                </tr>
+              </thead>
+              <tbody>
+                <div class="Children">
+                  {% for Children in my_children %}
+                    <tr>
+                      <td>{{Children.first_name}}</td>
+                      <td>{{Children.last_name}}</td>
+                      <td>{{Children.age}}</td>
+                        <th scope="col">
+                          <a class="btn btn-secondary btn-sm"
+                          href="{% url 'delete-children' Children.id %}"
+                          role="button">Delete</a>
+                        </th>
+                    </tr>
+                  {% endfor%}
+              </tbody>
+          </table>
+          </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

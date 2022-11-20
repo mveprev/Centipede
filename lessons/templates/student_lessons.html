@@ -5,11 +5,12 @@
         <div class='col-sm-12 col-md-6 offset-md-3'>
             <h1>Lessons Page for student</h1>
             <p><b>UNDER CONSTRUCTION</b>: In this page user can edit lessons.</p>
-            
+
             <!--Makes the table that will display lessons.-->
             <table class="table">
               <thead>
                 <tr>
+                  <th scope="col">Student</th>
                   <th scope="col">Availability</th>
                   <th scope="col">Lessons</th>
                   <th scope="col">Desired Interval</th>
@@ -24,6 +25,11 @@
                   And adds it to the table.-->
                   {% for Lesson in student_lessons %}
                     <tr>
+                      {% if Lesson.children %}
+                        <td>{{Lesson.children.first_name}} {{' '}} {{Lesson.children.last_name}}</td>
+                      {% else %}
+                        <td>{{Lesson.user.first_name}} {{' '}} {{Lesson.user.last_name}}</td>
+                      {% endif %}
                       <td>{{Lesson.availability}}</td>
                       <td>{{Lesson.lessons}}</td>
                       <td>{{Lesson.desiredInterval}}</td>
@@ -37,20 +43,20 @@
                         <th scope="col">
                           <button type="button" class="btn btn-secondary btn-sm" disabled>Delete</button></th>
                       {% else %}
-                      
+
                       <!--Delete and edit button-->
                         <td>No</td>
                         <th scope="col">
                           <a class="btn btn-primary btn-sm"
-                          href="{% url 'edit-lesson' Lesson.id %}" 
+                          href="{% url 'edit-lesson' Lesson.id %}"
                           role="button"
                           >Edit</a></th>
                         <th scope="col">
-                          <a class="btn btn-secondary btn-sm" 
-                          href="{% url 'delete-lesson' Lesson.id %}" 
+                          <a class="btn btn-secondary btn-sm"
+                          href="{% url 'delete-lesson' Lesson.id %}"
                           role="button">Delete</a>
                         </th>
-                        
+
                       {% endif %}
                     </tr>
                   {% endfor%}
