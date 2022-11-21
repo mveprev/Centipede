@@ -96,8 +96,9 @@ class LessonForm(forms.ModelForm):
 class ChildrenForm(forms.ModelForm):
     class Meta:
         model = Children
-        fields = ('first_name','last_name','age')
+        fields = ('first_name','last_name','age', 'email')
 
+    email = forms.CharField(label='child email (optional)', validators=[validate_email], required=False)
     first_name = forms.CharField(label='child first name')
     last_name = forms.CharField(label='child last name')
     age = forms.IntegerField(label='child age')

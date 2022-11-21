@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import redirect,render
 from .forms import SignUpForm, LogInForm, LessonForm, ChildrenForm
 from .models import User, Lesson, Children
-from django.db.models import Q
+from django.db.models import Prefetch
 
 # Create your views here.
 def home(request):
@@ -31,7 +31,14 @@ list and then sends them to the lesson page'''
 def student_lessons(request):
     if request.user.is_authenticated:
         currentUser = request.user
-        lessonsList = Lesson.objects.filter(user=currentUser)
+        asChild = Children.objects.filter(email=currentUser.email)
+        myChildrenEmail = Children.objects.filter(parent=currentUser).values('email')
+        if myChildrenEmail.exists():
+            allChildren = Children.objects.filter(email__in=myChildrenEmail)
+        else:
+            allChildren = Children.objects.none()
+        childUser = User.objects.filter(email__in=myChildrenEmail)
+        lessonsList = Lesson.objects.filter(user=currentUser)|Lesson.objects.filter(children__in=asChild)|Lesson.objects.filter(children__in=allChildren)|Lesson.objects.filter(user__in=childUser)
         return render(request, 'student_lessons.html', {'student_lessons':lessonsList})
     else:
         return render(request,'home.html')
@@ -42,7 +49,14 @@ def delete_lesson(request, lessonId):
     lesson.delete()
     if request.user.is_authenticated:
         currentUser = request.user
-        lessonsList = Lesson.objects.filter(user=currentUser)
+        asChild = Children.objects.filter(email=currentUser.email)
+        myChildrenEmail = Children.objects.filter(parent=currentUser).values('email')
+        if myChildrenEmail.exists():
+            allChildren = Children.objects.filter(email__in=myChildrenEmail)
+        else:
+            allChildren = Children.objects.none()
+        childUser = User.objects.filter(email__in=myChildrenEmail)
+        lessonsList = Lesson.objects.filter(user=currentUser)|Lesson.objects.filter(children__in=asChild)|Lesson.objects.filter(children__in=allChildren)|Lesson.objects.filter(user__in=childUser)
         return render(request, 'student_lessons.html', {'student_lessons':lessonsList})
     else:
         return render(request,'home.html')
@@ -50,13 +64,20 @@ def delete_lesson(request, lessonId):
 #Edits lessons
 def edit_lesson(request, lessonId):
     lesson = Lesson.objects.get(id=lessonId)
-    form = LessonForm(request.POST or None, instance = lesson)
+    form = LessonForm(data=request.POST or None, request=request, instance = lesson)
     if form.is_valid():
         lesson = form.save(commit=False)
         lesson.user=request.user
         lesson.save()
         currentUser = request.user
-        lessonsList = Lesson.objects.filter(user=currentUser)
+        asChild = Children.objects.filter(email=currentUser.email)
+        myChildrenEmail = Children.objects.filter(parent=currentUser).values('email')
+        if myChildrenEmail.exists():
+            allChildren = Children.objects.filter(email__in=myChildrenEmail)
+        else:
+            allChildren = Children.objects.none()
+        childUser = User.objects.filter(email__in=myChildrenEmail)
+        lessonsList = Lesson.objects.filter(user=currentUser)|Lesson.objects.filter(children__in=asChild)|Lesson.objects.filter(children__in=allChildren)|Lesson.objects.filter(user__in=childUser)
         return render(request, 'student_lessons.html', {'student_lessons':lessonsList})
     return render(request, 'update_lessons.html',
     {'lesson':lesson,

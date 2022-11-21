@@ -59,6 +59,7 @@ class Children(models.Model):
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     age = models.IntegerField(blank=False)
+    email = models.CharField(max_length=50, blank=True, null=True)
     id = models.AutoField(primary_key=True, unique=True)
     parent = models.ForeignKey(User, on_delete=models.CASCADE)
 
