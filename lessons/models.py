@@ -55,6 +55,14 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
     USERNAME_FIELD = 'email'
 
+class Children(models.Model):
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
+    age = models.IntegerField(blank=False)
+    email = models.CharField(max_length=50, blank=True, null=True)
+    id = models.AutoField(primary_key=True, unique=True)
+    parent = models.ForeignKey(User, on_delete=models.CASCADE)
+
 class Lesson(models.Model):
     availability = models.IntegerField(blank=False)
     lessons = models.IntegerField(blank=False)
@@ -63,4 +71,5 @@ class Lesson(models.Model):
     furtherInfo = models.TextField(blank=False)
     id = models.AutoField(primary_key=True, unique=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    children = models.ForeignKey(Children, on_delete=models.CASCADE, blank=True, null=True)
     is_confirmed = models.BooleanField(default=False)
