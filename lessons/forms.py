@@ -61,9 +61,9 @@ class LessonForm(forms.ModelForm):
     ('60', '60'),
     ]
 
-    availability=forms.IntegerField(label=mark_safe("<strong>Enter availability :</strong>"))
+    availability=forms.IntegerField(label=mark_safe("<strong>Enter availability :</strong>"),min_value=1)
 
-    lessons= forms.IntegerField(label=mark_safe("<strong>Enter the number of lessons:</strong>"))
+    lessons= forms.IntegerField(label=mark_safe("<strong>Enter the number of lessons:</strong>"),min_value=1)
 
     desiredInterval=forms.IntegerField(label=mark_safe("<strong>Enter desired interval between lessons:</strong>"),
     widget=forms.Select(choices=INTERVAL_CHOICES))
