@@ -5,6 +5,55 @@
         <div class='col-sm-12 col-md-6 offset-md-3'>
             <h1>Lessons Page for admin</h1>
             <p><b>UNDER CONSTRUCTION</b>: In this page administrator can edit lessons.</p>
+            <!--Makes the table that will display lessons.-->
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Name</th>
+                  <th scope="col">Availability</th>
+                  <th scope="col">Lessons</th>
+                  <th scope="col">Desired Interval</th>
+                  <th scope="col">Duration</th>
+                  <th scope="col">Further Info</th>
+                  <th scope="col">Approved</th>
+                </tr>
+              </thead>
+              <tbody>
+                <div class="Lesson">
+                  <!--For loop goes through every student
+                  And adds it to the table.-->
+                  {% for Lesson in admin_lessons %}
+                    <tr>
+                      <td>{{Lesson.user.first_name}}{{' '}}{{Lesson.user.last_name}}</td>
+                      <td>{{Lesson.availability}}</td>
+                      <td>{{Lesson.lessons}}</td>
+                      <td>{{Lesson.desiredInterval}}</td>
+                      <td>{{Lesson.duration}}</td>
+                      <td>{{Lesson.furtherInfo}}</td>
+
+                      <!--Delete and edit button-->
+                      {% if Lesson.is_confirmed %}
+                      <td>Yes</td>
+                      <th scope="col">
+                        <a class="btn btn-primary btn-sm"
+                        href="{% url 'edit-lesson' Lesson.id %}"
+                        role="button">Edit</a></th>
+                      <th scope="col">
+                        <a class="btn btn-secondary btn-sm"
+                        href="{% url 'delete-lesson' Lesson.id %}"
+                        role="button">Delete</a>
+                      </th>
+                      {% else %}
+                      <td>No</td>
+                      <th scope="col">
+                        <a class="btn btn-secondary btn-sm"
+                        href="{% url 'book-lesson' Lesson.id %}"
+                        role="button">Book</a>
+                      {% endif %}
+                    </tr>
+                  {% endfor%}
+              </tbody>
+          </table>
         </div>
     </div>
 </div>

@@ -21,9 +21,9 @@ def student_landing_page(request):
         form = LessonForm()
     return render(request, 'student_landing_page.html',{'form': form})
 
-'''Checks if the user is logged in.If not, 
-sends them back to the home page.If they are, 
-all of their lessons are assigned to lesson 
+'''Checks if the user is logged in.If not,
+sends them back to the home page.If they are,
+all of their lessons are assigned to lesson
 list and then sends them to the lesson page'''
 def student_lessons(request):
     if request.user.is_authenticated:
@@ -32,6 +32,10 @@ def student_lessons(request):
         return render(request, 'student_lessons.html', {'student_lessons':lessonsList})
     else:
         return render(request,'home.html')
+
+def admin_lessons(request):
+    lessonsList = Lesson.objects.all()
+    return render(request, 'admin_lessons.html', {'admin_lessons': lessonsList})
 
 #Delete a lessons
 def delete_lesson(request, lessonId):
@@ -43,7 +47,7 @@ def delete_lesson(request, lessonId):
         return render(request, 'student_lessons.html', {'student_lessons':lessonsList})
     else:
         return render(request,'home.html')
-        
+
 #Edits lessons
 def edit_lesson(request, lessonId):
     lesson = Lesson.objects.get(id=lessonId)
@@ -55,18 +59,28 @@ def edit_lesson(request, lessonId):
         currentUser = request.user
         lessonsList = Lesson.objects.filter(user=currentUser)
         return render(request, 'student_lessons.html', {'student_lessons':lessonsList})
-    return render(request, 'update_lessons.html', 
+    return render(request, 'update_lessons.html',
     {'lesson':lesson,
     'form':form})
+
+def book_lesson(request, lessonId):
+    lesson = Lesson.objects.get(id=lessonId)
+    form = LessonForm(request.POST or None, instance = lesson)
+    if form.is_valid():
+        lesson = form.save(commit=False)
+        lesson.is_confirmed = True
+        lesson.save()
+        lessonsList = Lesson.objects.all()
+        return render(request, 'admin_lessons.html', {'admin_lessons': lessonsList})
+    return render(request, 'book_lessons.html',
+    {'lesson': lesson,
+    'form': form})
 
 def student_payment(request):
     return render(request, 'student_payment.html')
 
 def admin_landing_page(request):
     return render(request, 'admin_landing_page.html')
-
-def admin_lessons(request):
-    return render(request, 'admin_lessons.html')
 
 def admin_payment(request):
     return render(request, 'admin_payment.html')
