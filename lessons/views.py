@@ -87,10 +87,9 @@ def edit_lesson(request, lessonId):
     {'lesson':lesson,
     'form':form})
 
-<<<<<<< HEAD
 def book_lesson(request, lessonId):
     lesson = Lesson.objects.get(id=lessonId)
-    form = LessonForm(request.POST or None, instance = lesson)
+    form = LessonForm(data=request.POST or None, request=request, instance = lesson)
     if form.is_valid():
         lesson = form.save(commit=False)
         lesson.is_confirmed = True
@@ -100,7 +99,7 @@ def book_lesson(request, lessonId):
     return render(request, 'book_lessons.html',
     {'lesson': lesson,
     'form': form})
-=======
+
 def add_children(request):
     if request.method == "POST":
         form = ChildrenForm(request.POST)
@@ -130,7 +129,6 @@ def delete_children(request, childrenId):
         return render(request, 'my_children.html', {'my_children':childrenList})
     else:
         return render(request,'home.html')
->>>>>>> main
 
 def student_payment(request):
     return render(request, 'student_payment.html')
