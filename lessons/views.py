@@ -43,6 +43,10 @@ def student_lessons(request):
     else:
         return render(request,'home.html')
 
+def admin_lessons(request):
+    lessonsList = Lesson.objects.all()
+    return render(request, 'admin_lessons.html', {'admin_lessons': lessonsList})
+
 #Delete a lessons
 def delete_lesson(request, lessonId):
     lesson = Lesson.objects.get(id=lessonId)
@@ -83,6 +87,19 @@ def edit_lesson(request, lessonId):
     {'lesson':lesson,
     'form':form})
 
+def book_lesson(request, lessonId):
+    lesson = Lesson.objects.get(id=lessonId)
+    form = LessonForm(data=request.POST or None, request=request, instance = lesson)
+    if form.is_valid():
+        lesson = form.save(commit=False)
+        lesson.is_confirmed = True
+        lesson.save()
+        lessonsList = Lesson.objects.all()
+        return render(request, 'admin_lessons.html', {'admin_lessons': lessonsList})
+    return render(request, 'book_lessons.html',
+    {'lesson': lesson,
+    'form': form})
+
 def add_children(request):
     if request.method == "POST":
         form = ChildrenForm(request.POST)
@@ -118,9 +135,6 @@ def student_payment(request):
 
 def admin_landing_page(request):
     return render(request, 'admin_landing_page.html')
-
-def admin_lessons(request):
-    return render(request, 'admin_lessons.html')
 
 def admin_payment(request):
     return render(request, 'admin_payment.html')

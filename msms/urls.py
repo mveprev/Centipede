@@ -33,5 +33,6 @@ urlpatterns = [
     path('my_children/', views.my_children, name = 'my_children'),
     path('delete_children/<childrenId>', views.delete_children, name= 'delete-children'),
     path('delete_lesson/<lessonId>', views.delete_lesson, name= 'delete-lesson'),
-    path('edit_lesson/<lessonId>', views.edit_lesson, name='edit-lesson')
+    path('edit_lesson/<lessonId>', views.edit_lesson, name='edit-lesson'),
+    path('book_lesson/<lessonId>', views.book_lesson, name='book-lesson')
 ]
