@@ -2,14 +2,10 @@ from django.core.validators import validate_email
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import redirect,render
-<<<<<<< HEAD
-from .forms import SignUpForm, LogInForm, LessonForm, ChildrenForm
+from .forms import SignUpForm, LogInForm, LessonForm, BookingForm, ChildrenForm
 from .forms import DateForm
 from .models import User, Lesson, Children, TermDates
-=======
-from .forms import SignUpForm, LogInForm, LessonForm, BookingForm, ChildrenForm
-from .models import User, Lesson, Children
->>>>>>> 190f2c1f9fddc1f7c8f389bc4cc5df00cad3ad4f
+
 from django.db.models import Prefetch
 
 # Create your views here.
