@@ -34,5 +34,9 @@ urlpatterns = [
     path('delete_children/<childrenId>', views.delete_children, name= 'delete-children'),
     path('delete_lesson/<lessonId>', views.delete_lesson, name= 'delete-lesson'),
     path('edit_lesson/<lessonId>', views.edit_lesson, name='edit-lesson'),
-    path('book_lesson/<lessonId>', views.book_lesson, name='book-lesson')
+    path('book_lesson/<lessonId>', views.book_lesson, name='book-lesson'),
+    path('terms/', views.term_dates, name='term_dates'),
+    path('view_terms/', views.view_term_dates, name='view_term_dates'),
+    path('edit_terms/<term_id>', views.edit_term_dates, name='edit_term_dates'),
+    path('delete_terms/<term_id>', views.delete_term_dates, name='delete_term_dates'),
 ]
