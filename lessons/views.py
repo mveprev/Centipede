@@ -2,9 +2,14 @@ from django.core.validators import validate_email
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import redirect,render
+<<<<<<< HEAD
 from .forms import SignUpForm, LogInForm, LessonForm, ChildrenForm
 from .forms import DateForm
 from .models import User, Lesson, Children, TermDates
+=======
+from .forms import SignUpForm, LogInForm, LessonForm, BookingForm, ChildrenForm
+from .models import User, Lesson, Children
+>>>>>>> 190f2c1f9fddc1f7c8f389bc4cc5df00cad3ad4f
 from django.db.models import Prefetch
 
 # Create your views here.
@@ -90,7 +95,7 @@ def edit_lesson(request, lessonId):
 
 def book_lesson(request, lessonId):
     lesson = Lesson.objects.get(id=lessonId)
-    form = LessonForm(data=request.POST or None, request=request, instance = lesson)
+    form = BookingForm(data=request.POST or None, request=request, instance = lesson)
     if form.is_valid():
         lesson = form.save(commit=False)
         lesson.is_confirmed = True
@@ -100,6 +105,24 @@ def book_lesson(request, lessonId):
     return render(request, 'book_lessons.html',
     {'lesson': lesson,
     'form': form})
+
+def edit_booking(request, lessonId):
+    lesson = Lesson.objects.get(id=lessonId)
+    form = BookingForm(data=request.POST or None, request=request, instance = lesson)
+    if form.is_valid():
+        lesson = form.save(commit=False)
+        lesson.save()
+        lessonsList = Lesson.objects.all()
+        return render(request, 'admin_lessons.html', {'admin_lessons':lessonsList})
+    return render(request, 'update_bookings.html',
+    {'lesson':lesson,
+    'form':form})
+
+def delete_booking(request, lessonId):
+    lesson = Lesson.objects.get(id=lessonId)
+    lesson.delete()
+    lessonsList = Lesson.objects.all()
+    return render(request, 'admin_lessons.html', {'admin_lessons':lessonsList})
 
 def add_children(request):
     if request.method == "POST":
