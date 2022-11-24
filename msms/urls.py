@@ -41,3 +41,4 @@ urlpatterns = [
     path('delete_terms/<term_id>', views.delete_term_dates, name='delete_term_dates'),
     path('edit_booking/<lessonId>', views.edit_booking, name='edit-booking'),
     path('delete_booking/<lessonId>', views.delete_booking, name='delete-booking')
+]
