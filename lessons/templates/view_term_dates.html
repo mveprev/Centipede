@@ -1,0 +1,42 @@
+{% extends 'admin_base_content.html' %}
+{% block admin_content %}
+<div class='container'>
+    <div class='row'>
+        <div class='col-sm-12 col-md-6 offset-md-3'>
+            <h1>Term Dates</h1>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Start Date</th>
+                  <th scope="col">End Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                <div class="Terms">
+
+                  {% for TermDates in term_dates %}
+                    <tr>
+                      <td>{{TermDates.start_date}}</td>
+                      <td>{{TermDates.end_date}}</td>
+                      <th scope="col">
+                        <a class="btn btn-primary btn-sm"
+                        href="{% url 'edit_term_dates' TermDates.pk%}"
+                        role="button"
+                        >Edit</a></th>
+                        <th scope="col">
+                          <a class="btn btn-secondary btn-sm"
+                          href="{% url 'delete_term_dates' TermDates.pk%}"
+                          role="button">Delete</a>
+                        </th>
+                    </tr>
+                  {% endfor%}
+              </tbody>
+          </table>
+          <a class="btn btn-primary btn-sm"
+          href="{% url 'term_dates'%}"
+          role="button"
+          >Add</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,8 +1,10 @@
 from django.core.validators import validate_email
 from django.core.validators import RegexValidator
 from django import forms
-from lessons.models import User, Children
+from lessons.models import User, Children, TermDates
 from django.utils.safestring import mark_safe
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 
 from .models import Lesson
 
@@ -139,3 +141,40 @@ class ChildrenForm(forms.ModelForm):
     first_name = forms.CharField(label='child first name')
     last_name = forms.CharField(label='child last name')
     age = forms.IntegerField(label='child age')
+
+class DatePickerInput(forms.DateInput):
+    input_type = 'date'
+
+class DateForm(forms.ModelForm):
+    class Meta:
+        model = TermDates
+        fields = ('start_date', 'end_date')
+    
+    
+    
+    start_date = forms.DateField(widget=DatePickerInput)
+    end_date = forms.DateField(widget=DatePickerInput)
+
+    
+    
+    
+    def clean_start_date(self, *args, **kwargs):
+        start_date = self.cleaned_data.get("start_date")
+        for each in TermDates.objects.all():
+            if each.start_date <= start_date <= each.end_date and self.instance.pk != each.pk:
+                raise forms.ValidationError("Overlaps with other terms")
+        return start_date
+    
+    def clean_end_date(self, *args, **kwargs):
+        end_date = self.cleaned_data.get("end_date")
+        start_date = self.cleaned_data.get("start_date")
+        if start_date != None:
+            if end_date <= start_date:
+                raise forms.ValidationError("Range not valid")
+            for each in TermDates.objects.all():
+                if each.end_date >= end_date >= each.start_date and self.instance.pk != each.pk:
+                    raise forms.ValidationError("Overlaps with other terms")
+        return end_date
+
+
+    

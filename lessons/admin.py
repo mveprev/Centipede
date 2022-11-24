@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import User
 from .models import Lesson
+from .models import TermDates
 
 # Register your models here.
 admin.site.enable_nav_sidebar = False
@@ -19,3 +20,8 @@ class UserAdmin(admin.ModelAdmin):
 @admin.register(Lesson)
 class LessonAdmin(admin.ModelAdmin):
      list_display = ('id', 'is_confirmed')
+     
+    
+@admin.register(TermDates)
+class TermAdmin(admin.ModelAdmin):
+    list_display = ('start_date', 'end_date')
