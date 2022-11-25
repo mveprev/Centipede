@@ -63,32 +63,32 @@ class LessonForm(forms.ModelForm):
 
     DAY_CHOICES= [
     ('',''),
-    ('1', 'Monday'),
-    ('2', 'Tuesday'),
-    ('3', 'Wednesday'),
-    ('4', 'Thursday'),
-    ('5', 'Friday'),
+    ('Monday', 'Monday'),
+    ('Tuesday', 'Tuesday'),
+    ('Wednesday', 'Wednesday'),
+    ('Thursday', 'Thursday'),
+    ('Friday', 'Friday'),
     ]
     TIME_CHOICES= [
     ('',''),
-    ('1', '9:00-10:00'),
-    ('2', '10:00-11:00'),
-    ('3', '11:00-12:00'),
-    ('4', '12:00:13:00'),
-    ('5', '13:00-14:00'),
-    ('6', '14:00-15:00'),
-    ('7', '15:00-16:00'),
-    ('8', '16:00-17:00'),
-    ('9', '17:00-18:00'),
-    ('10', '18:00-19:00'),
-    ('11', '19:00-20:00'),
+    ('9:00-10:00', '9:00-10:00'),
+    ('10:00-11:00', '10:00-11:00'),
+    ('11:00-12:00', '11:00-12:00'),
+    ('12:00:13:00', '12:00:13:00'),
+    ('13:00-14:00', '13:00-14:00'),
+    ('14:00-15:00', '14:00-15:00'),
+    ('15:00-16:00', '15:00-16:00'),
+    ('16:00-17:00', '16:00-17:00'),
+    ('17:00-18:00', '17:00-18:00'),
+    ('18:00-19:00', '18:00-19:00'),
+    ('19:00-20:00', '19:00-20:00'),
     ]
 
     INTERVAL_CHOICES= [
     ('',''),
-    ('1', 'Once a week'),
-    ('2', 'Once every two weeks'),
-    ('3', 'Once a month'),
+    ('Once a week', 'Once a week'),
+    ('Once every two weeks', 'Once every two weeks'),
+    ('Once a month', 'Once a month'),
     ]
 
     DURATION_CHOICES= [
@@ -106,13 +106,13 @@ class LessonForm(forms.ModelForm):
         label=mark_safe("<strong>Select Children</strong>")
     )
 
-    availabilityDay=forms.IntegerField(label=mark_safe("<strong>Choose your available day:</strong>"),widget=forms.Select(choices=DAY_CHOICES))
-    availabilityTime=forms.IntegerField(label=mark_safe("<strong>Choose your available time:</strong>"),widget=forms.Select(choices=TIME_CHOICES))
+    availabilityDay=forms.CharField(label=mark_safe("<strong>Choose your available day:</strong>"),widget=forms.Select(choices=DAY_CHOICES))
+    availabilityTime=forms.CharField(label=mark_safe("<strong>Choose your available time:</strong>"),widget=forms.Select(choices=TIME_CHOICES))
 
 
     lessons= forms.IntegerField(label=mark_safe("<strong>Enter the number of lessons</strong>"))
 
-    desiredInterval=forms.IntegerField(label=mark_safe("<strong>Enter desired interval between lessons</strong>"),
+    desiredInterval=forms.CharField(label=mark_safe("<strong>Enter desired interval between lessons</strong>"),
     widget=forms.Select(choices=INTERVAL_CHOICES))
 
     duration=forms.IntegerField(label=mark_safe("<strong>Enter duration of the lesson</strong>"),
@@ -131,34 +131,35 @@ class BookingForm(forms.ModelForm):
         model = Lesson
         fields = ('lessons','availabilityDay','availabilityTime','desiredInterval','duration','furtherInfo','id')
 
+    
     DAY_CHOICES= [
     ('',''),
-    ('1', 'Monday'),
-    ('2', 'Tuesday'),
-    ('3', 'Wednesday'),
-    ('4', 'Thursday'),
-    ('5', 'Friday'),
+    ('Monday', 'Monday'),
+    ('Tuesday', 'Tuesday'),
+    ('Wednesday', 'Wednesday'),
+    ('Thursday', 'Thursday'),
+    ('Friday', 'Friday'),
     ]
     TIME_CHOICES= [
     ('',''),
-    ('1', '9:00-10:00'),
-    ('2', '10:00-11:00'),
-    ('3', '11:00-12:00'),
-    ('4', '12:00:13:00'),
-    ('5', '13:00-14:00'),
-    ('6', '14:00-15:00'),
-    ('7', '15:00-16:00'),
-    ('8', '16:00-17:00'),
-    ('9', '17:00-18:00'),
-    ('10', '18:00-19:00'),
-    ('11', '19:00-20:00'),
+    ('9:00-10:00', '9:00-10:00'),
+    ('10:00-11:00', '10:00-11:00'),
+    ('11:00-12:00', '11:00-12:00'),
+    ('12:00:13:00', '12:00:13:00'),
+    ('13:00-14:00', '13:00-14:00'),
+    ('14:00-15:00', '14:00-15:00'),
+    ('15:00-16:00', '15:00-16:00'),
+    ('16:00-17:00', '16:00-17:00'),
+    ('17:00-18:00', '17:00-18:00'),
+    ('18:00-19:00', '18:00-19:00'),
+    ('19:00-20:00', '19:00-20:00'),
     ]
 
     INTERVAL_CHOICES= [
     ('',''),
-    ('1', 'Once a week'),
-    ('2', 'Once every two weeks'),
-    ('3', 'Once a month'),
+    ('Once a week', 'Once a week'),
+    ('Once every two weeks', 'Once every two weeks'),
+    ('Once a month', 'Once a month'),
     ]
 
     DURATION_CHOICES= [
@@ -168,12 +169,12 @@ class BookingForm(forms.ModelForm):
     ('60', '60'),
     ]
 
-    availabilityDay=forms.IntegerField(label=mark_safe("<strong>Choose your available day:</strong>"),widget=forms.Select(choices=DAY_CHOICES))
-    availabilityTime=forms.IntegerField(label=mark_safe("<strong>Choose your available time:</strong>"),widget=forms.Select(choices=TIME_CHOICES))
+    availabilityDay=forms.CharField(label=mark_safe("<strong>Choose your available day:</strong>"),widget=forms.Select(choices=DAY_CHOICES))
+    availabilityTime=forms.CharField(label=mark_safe("<strong>Choose your available time:</strong>"),widget=forms.Select(choices=TIME_CHOICES))
 
     lessons= forms.IntegerField(label=mark_safe("<strong>Enter the number of lessons</strong>"))
 
-    desiredInterval=forms.IntegerField(label=mark_safe("<strong>Enter the interval between lessons</strong>"),
+    desiredInterval=forms.CharField(label=mark_safe("<strong>Enter desired interval between lessons</strong>"),
     widget=forms.Select(choices=INTERVAL_CHOICES))
 
     duration=forms.IntegerField(label=mark_safe("<strong>Enter duration of the lesson</strong>"),

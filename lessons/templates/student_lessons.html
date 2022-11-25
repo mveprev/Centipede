@@ -11,7 +11,8 @@
               <thead>
                 <tr>
                   <th scope="col">Student</th>
-                  <th scope="col">Availability</th>
+                  <th scope="col">Availability Day</th>
+                  <th scope="col">Availability Time</th>
                   <th scope="col">Lessons</th>
                   <th scope="col">Desired Interval</th>
                   <th scope="col">Duration</th>
@@ -30,7 +31,8 @@
                       {% else %}
                         <td>{{Lesson.user.first_name}} {{' '}} {{Lesson.user.last_name}}</td>
                       {% endif %}
-                      <td>{{Lesson.availability}}</td>
+                      <td>{{Lesson.availabilityDay}}</td>
+                      <td>{{Lesson.availabilityTime}}</td>
                       <td>{{Lesson.lessons}}</td>
                       <td>{{Lesson.desiredInterval}}</td>
                       <td>{{Lesson.duration}}</td>
