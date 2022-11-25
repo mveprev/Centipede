@@ -220,14 +220,14 @@ def log_out(request):
 def invoice_generator(request, lessonId):
     currentUser = request.user
     currentLesson = Lesson.objects.get(id=lessonId)
-    invoiceId = str(currentUser.pk) + "-" + str(currentLesson.pk)
+    invoiceId = (str(currentUser.pk)[:4]).zfill(4) + "-" + (str(currentLesson.pk)[:4]).zfill(4)
     lessonCost = 20
     totalCost = lessonCost*currentLesson.lessons
     information = {
         "first_name": currentUser.first_name,
         "last_name": currentUser.last_name,
         "email_address": currentUser.email,
-        "Student_Id": currentUser.pk,
+        "Student_Id": (str(currentUser.pk)[:4]).zfill(4),
         "Invoice_Id": invoiceId,
         "Lesson_type": "Type of Instrument",
         "Number_of_lessons": currentLesson.lessons,
