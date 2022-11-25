@@ -74,7 +74,10 @@ class Lesson(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     children = models.ForeignKey(Children, on_delete=models.CASCADE, blank=True, null=True)
     is_confirmed = models.BooleanField(default=False)
-    
+    invoiceNum = models.CharField(max_length = 50, default = 'default')
+    studentNum = models.CharField(max_length = 50, default = 'default')
+    invoiceEmail = models.CharField(max_length = 50, default = 'default')
+
 class TermDates(models.Model):
     start_date = models.DateField()
     end_date = models.DateField()

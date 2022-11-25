@@ -21,6 +21,7 @@ def student_landing_page(request):
         if form.is_valid():
             lesson = form.save(commit=False)
             lesson.user = request.user
+            lesson.invoiceEmail = request.user.email
             lesson.save()
             return redirect('student_landing_page')
     else:
@@ -224,7 +225,7 @@ def term_dates(request):
 def view_term_dates(request):
     terms = TermDates.objects.all()
     return render(request, 'view_term_dates.html', {"term_dates":terms})
-    
+
 def edit_term_dates(request, term_id):
     term = TermDates.objects.get(pk=term_id)
     form = DateForm(data=request.POST or None, instance = term)
@@ -235,13 +236,13 @@ def edit_term_dates(request, term_id):
         return render(request, 'view_term_dates.html', {"term_dates":terms})
     terms = TermDates.objects.all()
     return render(request, 'edit_term.html', {"term_dates":terms, 'form':form})
-    
+
 def delete_term_dates(request, term_id):
     term = TermDates.objects.get(pk=term_id)
     term.delete()
     terms = TermDates.objects.all()
     return render(request, 'view_term_dates.html', {"term_dates":terms})
-    
+
 def log_out(request):
     logout(request)
     return redirect('home')
@@ -252,15 +253,27 @@ def log_out(request):
 def invoice_generator(request, lessonId):
     currentUser = request.user
     currentLesson = Lesson.objects.get(id=lessonId)
-    invoiceId = (str(currentUser.pk)[:4]).zfill(4) + "-" + (str(currentLesson.pk)[:4]).zfill(4)
     lessonCost = 20
     totalCost = lessonCost*currentLesson.lessons
+    if currentLesson.invoiceNum == 'default':
+        currentLesson.invoiceNum = (str(currentUser.pk)[:4]).zfill(4) + "-" + (str(currentLesson.pk)[:4]).zfill(4)
+        currentLesson.save()
+    if currentLesson.studentNum == 'default':
+        currentLesson.studentNum = (str(currentUser.pk)[:4]).zfill(4)
+        currentLesson.save()
+    if(currentLesson.children is not None):
+        first_name = currentLesson.children.first_name;
+        last_name = currentLesson.children.last_name;
+    else:
+        first_name = currentUser.first_name;
+        last_name = currentUser.last_name;
+
     information = {
-        "first_name": currentUser.first_name,
-        "last_name": currentUser.last_name,
-        "email_address": currentUser.email,
-        "Student_Id": (str(currentUser.pk)[:4]).zfill(4),
-        "Invoice_Id": invoiceId,
+        "first_name": first_name,
+        "last_name": last_name,
+        "email_address": currentLesson.invoiceEmail,
+        "Student_Id": currentLesson.studentNum,
+        "Invoice_Id": currentLesson.invoiceNum,
         "Lesson_type": "Type of Instrument",
         "Number_of_lessons": currentLesson.lessons,
         "Cost_per_lesson": lessonCost,
