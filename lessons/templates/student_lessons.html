@@ -42,6 +42,8 @@
                         <th scope="col"><button type="button" class="btn btn-primary btn-sm" disabled>Edit</button></th>
                         <th scope="col">
                           <button type="button" class="btn btn-secondary btn-sm" disabled>Delete</button></th>
+                          <th scope="col">
+                         <a class="btn btn-secondary btn-sm" href="{% url 'invoices' Lesson.id %}" role="button">Invoice</a></th>
                       {% else %}
 
                       <!--Delete and edit button-->
@@ -55,6 +57,9 @@
                           <a class="btn btn-secondary btn-sm"
                           href="{% url 'delete-lesson' Lesson.id %}"
                           role="button">Delete</a>
+                        </th>
+                        <th scope="col">
+                    <button type="button" class="btn btn-secondary btn-sm" disabled>Invoice</button>
                         </th>
 
                       {% endif %}
