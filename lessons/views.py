@@ -3,7 +3,9 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import redirect, render
 from .forms import SignUpForm, LogInForm, LessonForm, BookingForm, ChildrenForm
-from .models import User, Lesson, Children
+from .forms import DateForm
+from .models import User, Lesson, Children, TermDates
+
 from django.db.models import Prefetch
 
 # Create your views here.
@@ -210,6 +212,36 @@ def log_in(request):
     return render(request, 'log_in.html', {'form': form})
 
 
+def term_dates(request):
+    form = DateForm(request.POST)
+    if request.method == "POST":
+        if form.is_valid():
+            form.save()
+            terms = TermDates.objects.all()
+            return redirect('view_term_dates')
+    return render(request, 'term_dates.html', {'form':form})
+
+def view_term_dates(request):
+    terms = TermDates.objects.all()
+    return render(request, 'view_term_dates.html', {"term_dates":terms})
+    
+def edit_term_dates(request, term_id):
+    term = TermDates.objects.get(pk=term_id)
+    form = DateForm(data=request.POST or None, instance = term)
+    if form.is_valid():
+        term = form.save(commit=False)
+        term.save()
+        terms = TermDates.objects.all()
+        return render(request, 'view_term_dates.html', {"term_dates":terms})
+    terms = TermDates.objects.all()
+    return render(request, 'edit_term.html', {"term_dates":terms, 'form':form})
+    
+def delete_term_dates(request, term_id):
+    term = TermDates.objects.get(pk=term_id)
+    term.delete()
+    terms = TermDates.objects.all()
+    return render(request, 'view_term_dates.html', {"term_dates":terms})
+    
 def log_out(request):
     logout(request)
     return redirect('home')

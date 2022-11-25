@@ -1,0 +1,17 @@
+{% extends 'admin_base_content.html' %}
+{% block admin_content %}
+<div class='container'>
+    <div class='row'>
+        <div class='col-sm-12 col-md-6 offset-md-3'>
+            <h1>Term Dates</h1>
+            <form action="" method=POST>
+              {% csrf_token%}
+              {{form.as_p}}
+              
+              <input type="submit" value = "Submit"
+              class="btn btn-success">
+              </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

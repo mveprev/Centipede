@@ -64,12 +64,17 @@ class Children(models.Model):
     parent = models.ForeignKey(User, on_delete=models.CASCADE)
 
 class Lesson(models.Model):
-    availability = models.IntegerField(blank=False)
+    availabilityDay = models.IntegerField(blank=False)
+    availabilityTime = models.IntegerField(blank=False)
     lessons = models.IntegerField(blank=False)
     desiredInterval = models.IntegerField(blank=False)
     duration = models.IntegerField(blank=False)
-    furtherInfo = models.TextField(blank=False)
+    furtherInfo = models.TextField()
     id = models.AutoField(primary_key=True, unique=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     children = models.ForeignKey(Children, on_delete=models.CASCADE, blank=True, null=True)
     is_confirmed = models.BooleanField(default=False)
+    
+class TermDates(models.Model):
+    start_date = models.DateField()
+    end_date = models.DateField()

@@ -1,8 +1,10 @@
 from django.core.validators import validate_email
 from django.core.validators import RegexValidator
 from django import forms
-from lessons.models import User, Children
+from lessons.models import User, Children, TermDates
 from django.utils.safestring import mark_safe
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 
 from .models import Lesson
 
@@ -57,12 +59,36 @@ class LessonForm(forms.ModelForm):
 
     class Meta:
         model = Lesson
-        fields = ('children','lessons','availability','desiredInterval','duration','furtherInfo','id')
+        fields = ('children','lessons','availabilityDay','availabilityTime','desiredInterval','duration','furtherInfo','id')
+
+    DAY_CHOICES= [
+    ('',''),
+    ('1', 'Monday'),
+    ('2', 'Tuesday'),
+    ('3', 'Wednesday'),
+    ('4', 'Thursday'),
+    ('5', 'Friday'),
+    ]
+    TIME_CHOICES= [
+    ('',''),
+    ('1', '9:00-10:00'),
+    ('2', '10:00-11:00'),
+    ('3', '11:00-12:00'),
+    ('4', '12:00:13:00'),
+    ('5', '13:00-14:00'),
+    ('6', '14:00-15:00'),
+    ('7', '15:00-16:00'),
+    ('8', '16:00-17:00'),
+    ('9', '17:00-18:00'),
+    ('10', '18:00-19:00'),
+    ('11', '19:00-20:00'),
+    ]
 
     INTERVAL_CHOICES= [
     ('',''),
-    ('1', '1 LESSON EVERY 2 WEEK'),
-    ('2', '1 LESSON EVERY 2 WEEKS'),
+    ('1', 'Once a week'),
+    ('2', 'Once every two weeks'),
+    ('3', 'Once a month'),
     ]
 
     DURATION_CHOICES= [
@@ -80,7 +106,9 @@ class LessonForm(forms.ModelForm):
         label=mark_safe("<strong>Select Children</strong>")
     )
 
-    availability=forms.IntegerField(label=mark_safe("<strong>Enter availability</strong>"))
+    availabilityDay=forms.IntegerField(label=mark_safe("<strong>Choose your available day:</strong>"),widget=forms.Select(choices=DAY_CHOICES))
+    availabilityTime=forms.IntegerField(label=mark_safe("<strong>Choose your available time:</strong>"),widget=forms.Select(choices=TIME_CHOICES))
+
 
     lessons= forms.IntegerField(label=mark_safe("<strong>Enter the number of lessons</strong>"))
 
@@ -101,12 +129,36 @@ class BookingForm(forms.ModelForm):
 
     class Meta:
         model = Lesson
-        fields = ('lessons','availability','desiredInterval','duration','furtherInfo','id')
+        fields = ('lessons','availabilityDay','availabilityTime','desiredInterval','duration','furtherInfo','id')
+
+    DAY_CHOICES= [
+    ('',''),
+    ('1', 'Monday'),
+    ('2', 'Tuesday'),
+    ('3', 'Wednesday'),
+    ('4', 'Thursday'),
+    ('5', 'Friday'),
+    ]
+    TIME_CHOICES= [
+    ('',''),
+    ('1', '9:00-10:00'),
+    ('2', '10:00-11:00'),
+    ('3', '11:00-12:00'),
+    ('4', '12:00:13:00'),
+    ('5', '13:00-14:00'),
+    ('6', '14:00-15:00'),
+    ('7', '15:00-16:00'),
+    ('8', '16:00-17:00'),
+    ('9', '17:00-18:00'),
+    ('10', '18:00-19:00'),
+    ('11', '19:00-20:00'),
+    ]
 
     INTERVAL_CHOICES= [
     ('',''),
-    ('1', '1 LESSON EVERY 2 WEEK'),
-    ('2', '1 LESSON EVERY 2 WEEKS'),
+    ('1', 'Once a week'),
+    ('2', 'Once every two weeks'),
+    ('3', 'Once a month'),
     ]
 
     DURATION_CHOICES= [
@@ -116,7 +168,8 @@ class BookingForm(forms.ModelForm):
     ('60', '60'),
     ]
 
-    availability=forms.IntegerField(label=mark_safe("<strong>Enter availability</strong>"))
+    availabilityDay=forms.IntegerField(label=mark_safe("<strong>Choose your available day:</strong>"),widget=forms.Select(choices=DAY_CHOICES))
+    availabilityTime=forms.IntegerField(label=mark_safe("<strong>Choose your available time:</strong>"),widget=forms.Select(choices=TIME_CHOICES))
 
     lessons= forms.IntegerField(label=mark_safe("<strong>Enter the number of lessons</strong>"))
 
@@ -139,3 +192,40 @@ class ChildrenForm(forms.ModelForm):
     first_name = forms.CharField(label='child first name')
     last_name = forms.CharField(label='child last name')
     age = forms.IntegerField(label='child age')
+
+class DatePickerInput(forms.DateInput):
+    input_type = 'date'
+
+class DateForm(forms.ModelForm):
+    class Meta:
+        model = TermDates
+        fields = ('start_date', 'end_date')
+    
+    
+    
+    start_date = forms.DateField(widget=DatePickerInput)
+    end_date = forms.DateField(widget=DatePickerInput)
+
+    
+    
+    
+    def clean_start_date(self, *args, **kwargs):
+        start_date = self.cleaned_data.get("start_date")
+        for each in TermDates.objects.all():
+            if each.start_date <= start_date <= each.end_date and self.instance.pk != each.pk:
+                raise forms.ValidationError("Overlaps with other terms")
+        return start_date
+    
+    def clean_end_date(self, *args, **kwargs):
+        end_date = self.cleaned_data.get("end_date")
+        start_date = self.cleaned_data.get("start_date")
+        if start_date != None:
+            if end_date <= start_date:
+                raise forms.ValidationError("Range not valid")
+            for each in TermDates.objects.all():
+                if each.end_date >= end_date >= each.start_date and self.instance.pk != each.pk:
+                    raise forms.ValidationError("Overlaps with other terms")
+        return end_date
+
+
+    
