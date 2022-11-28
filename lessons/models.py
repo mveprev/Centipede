@@ -49,6 +49,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     )
     first_name = models.CharField(max_length=50, blank=False)
     last_name = models.CharField(max_length=50, blank=False)
+    is_teacher = models.BooleanField(default=False, verbose_name='teacher')
     is_staff = models.BooleanField(default=False, verbose_name='administrator')
     is_superuser = models.BooleanField(default=False, verbose_name='director')
     is_active = models.BooleanField(default=True, verbose_name='active')
@@ -98,8 +99,8 @@ class TermDates(models.Model):
     end_date = models.DateField()
 
 class Schedule(models.Model):
-    teacher = models.CharField(max_length=100, blank=False)
     time_stamp = models.DateTimeField(auto_now = True)
+    teacher = models.ForeignKey(User, on_delete=models.CASCADE)
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
     start_time = models.TimeField(auto_now = False)
     start_date = models.DateField(blank=False)

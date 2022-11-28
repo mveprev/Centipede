@@ -107,13 +107,10 @@ class LessonForm(forms.ModelForm):
     fridayNight=forms.BooleanField(required=False,label=mark_safe("<strong> &nbsp Night (18:00 - 22:00)</strong>"))
 
     lessons= forms.IntegerField(label=mark_safe("<strong>Enter the number of lessons</strong>"))
-
     desiredInterval=forms.CharField(label=mark_safe("<strong>Enter desired interval between lessons</strong>"),
     widget=forms.Select(choices=INTERVAL_CHOICES))
-
     duration=forms.IntegerField(label=mark_safe("<strong>Enter duration of the lesson</strong>"),
     widget=forms.Select(choices=DURATION_CHOICES))
-
     furtherInfo=forms.CharField(label=mark_safe("<strong>Add any further information below( (e.g. what do you want to learn or the name of a teacher if you have one in mind)</strong>"),
     widget=forms.Textarea(attrs={'rows':5, 'cols':60}))
 
@@ -138,13 +135,8 @@ class DateForm(forms.ModelForm):
         model = TermDates
         fields = ('start_date', 'end_date')
 
-
-
     start_date = forms.DateField(widget=DatePickerInput)
     end_date = forms.DateField(widget=DatePickerInput)
-
-
-
 
     def clean_start_date(self, *args, **kwargs):
         start_date = self.cleaned_data.get("start_date")
@@ -164,7 +156,15 @@ class DateForm(forms.ModelForm):
                     raise forms.ValidationError("Overlaps with other terms")
         return end_date
 
+class CustomScheduleForm(forms.ModelChoiceField):
+    def label_from_instance(self, user):
+        return user.first_name + ' ' + user.last_name
+
 class ScheduleForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request')
+        super(ScheduleForm, self).__init__(*args, **kwargs)
+        self.fields['teacher'].queryset = User.objects.filter(is_teacher=True)
 
     class Meta:
         model = Schedule
@@ -184,7 +184,13 @@ class ScheduleForm(forms.ModelForm):
     ('60', '60'),
     ]
 
-    teacher = forms.CharField(label=mark_safe("<strong>Select the teacher</strong>"))
+    teacher = CustomScheduleForm(
+        queryset=None,
+        empty_label='------------ Please select teacher ------------',
+        required=True,
+        widget=forms.Select,
+        label=mark_safe("<strong>Select Teacher</strong>")
+    )
     start_time = forms.TimeField(label=mark_safe("<strong>Enter the start time</strong>"),widget=TimePickerInput)
     start_date = forms.DateField(label=mark_safe("<strong>Enter the start date</strong>"),widget=DatePickerInput)
     number_of_lessons = forms.IntegerField(label=mark_safe("<strong>Enter the number of lessons</strong>"))

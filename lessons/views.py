@@ -5,15 +5,42 @@ from django.shortcuts import redirect, render
 from .forms import SignUpForm, LogInForm, LessonForm, ScheduleForm, ChildrenForm
 from .forms import DateForm
 from .models import User, Lesson, Children, TermDates, Schedule
-
 from django.db.models import Prefetch
 
+from datetime import datetime
+from django.http import HttpResponse
+from django.views import generic
+from django.utils.safestring import mark_safe
+from .utils import Calendar
 # Create your views here.
 
 
+class CalendarView(generic.ListView):
+    model = Schedule
+    template_name = 'teacher_landing_page.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # use today's date for the calendar
+        d = get_date(self.request.GET.get('day', None))
+
+        # Instantiate our calendar class with today's year and date
+        cal = Calendar(self.request.user, d.year, d.month)
+
+        # Call the formatmonth method, which returns our calendar as a table
+        html_cal = cal.formatmonth(withyear=True)
+        context['calendar'] = mark_safe(html_cal)
+        return context
+
+def get_date(req_day):
+    if req_day:
+        year, month = (int(x) for x in req_day.split('-'))
+        return date(year, month, day=1)
+    return datetime.today()
+
 def home(request):
     return render(request, 'home.html')
-
 
 def student_landing_page(request):
     if request.method == "POST":
@@ -105,7 +132,7 @@ def edit_lesson(request, lessonId):
 
 def book_lesson(request, lessonId):
     lesson = Lesson.objects.get(id=lessonId)
-    form = ScheduleForm(data=request.POST or None)
+    form = ScheduleForm(data=request.POST or None, request=request)
     if form.is_valid():
         schedule = form.save(commit=False)
         schedule.lesson = lesson
@@ -122,7 +149,7 @@ def book_lesson(request, lessonId):
 def edit_booking(request, lessonId):
     lesson = Lesson.objects.get(id=lessonId)
     schedule = Schedule.objects.get(lesson = lesson)
-    form = ScheduleForm(data=request.POST or None, instance=schedule)
+    form = ScheduleForm(data=request.POST or None, instance=schedule, request=request)
     if form.is_valid():
         schedule = form.save(commit=False)
         schedule.save()
@@ -210,6 +237,9 @@ def log_in(request):
                 if user.is_staff:
                     login(request, user)
                     return redirect('admin_landing_page')
+                if user.is_teacher:
+                    login(request, user)
+                    return redirect('teacher_landing_page')
                 login(request, user)
                 return redirect('student_landing_page')
         # Add error message here
