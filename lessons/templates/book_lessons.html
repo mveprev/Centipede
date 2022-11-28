@@ -3,7 +3,94 @@
 <div class='container'>
     <div class='row'>
         <div class='col-sm-12 col-md-6 offset-md-3'>
-            <h1>Page to book lessons</h1>
+            <h1>Student Requirement</h1>
+            <strong>Availability:</strong>
+            <p>
+                {% if lesson.mondayMorning %}
+                  <td>Monday Morning (8:00 - 12:00)</td>
+                {% endif %}
+            </p>
+            <p>
+                {% if lesson.mondayAfternoon %}
+                  <td>Monday afternoon (13:00 - 17:00)</td>
+                {% endif %}
+            </p>
+            <p>
+                {% if lesson.mondayNight %}
+                  <td>Monday night (18:00 - 22:00)</td>
+                {% endif %}
+            </p>
+            <p>
+                {% if lesson.tuesdayMorning %}
+                  <td>Tuesday Morning (8:00 - 12:00)</td>
+                {% endif %}
+            </p>
+            <p>
+                {% if lesson.tuesdayAfternoon %}
+                  <td>Tuesday afternoon (13:00 - 17:00)</td>
+                {% endif %}
+            </p>
+            <p>
+                {% if lesson.tuesdayNight %}
+                  <td>Tuesday night (18:00 - 22:00)</td>
+                {% endif %}
+            </p>
+            <p>
+                {% if lesson.wednesdayMorning %}
+                  <td>Wednesday Morning (8:00 - 12:00)</td>
+                {% endif %}
+            </p>
+            <p>
+                {% if lesson.wednesdayAfternoon %}
+                  <td>Wednesday afternoon (13:00 - 17:00)</td>
+                {% endif %}
+            </p>
+            <p>
+                {% if lesson.wednesdayNight %}
+                  <td>Wednesday night (18:00 - 22:00)</td>
+                {% endif %}
+            </p>
+            <p>
+                {% if lesson.thursdayMorning %}
+                  <td>Thursday Morning (8:00 - 12:00)</td>
+                {% endif %}
+            </p>
+            <p>
+                {% if lesson.thursdayAfternoon %}
+                  <td>Thursday afternoon (13:00 - 17:00)</td>
+                {% endif %}
+            </p>
+            <p>
+                {% if lesson.thursdayNight %}
+                  <td>Thursday night (18:00 - 22:00)</td>
+                {% endif %}
+            </p>
+            <p>
+                {% if lesson.fridayMorning %}
+                  <td>Friday Morning (8:00 - 12:00)</td>
+                {% endif %}
+            </p>
+            <p>
+                {% if lesson.fridayAfternoon %}
+                  <td>Friday afternoon (13:00 - 17:00)</td>
+                {% endif %}
+            </p>
+            <p>
+                {% if lesson.fridayNight %}
+                  <td>Friday night (18:00 - 22:00)</td>
+                {% endif %}
+            </p>
+            <strong>Number of lessons:</strong>
+            <p>{{lesson.lessons}}</p>
+            <strong>Desired interval between lessons:</strong>
+            <p>{{lesson.desiredInterval}}</p>
+            <strong>Duration of lessons:</strong>
+            <p>{{lesson.duration}}</p>
+            <strong>Further info:</strong>
+            <p>{{lesson.furtherInfo}}</p>
+
+            <h2>Schedule the lesson:</h2>
+
             <p><b>
               <form action="" method=POST>
               {% csrf_token %}

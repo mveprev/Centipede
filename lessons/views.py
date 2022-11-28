@@ -2,9 +2,9 @@ from django.core.validators import validate_email
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import redirect, render
-from .forms import SignUpForm, LogInForm, LessonForm, BookingForm, ChildrenForm
+from .forms import SignUpForm, LogInForm, LessonForm, ScheduleForm, ChildrenForm
 from .forms import DateForm
-from .models import User, Lesson, Children, TermDates
+from .models import User, Lesson, Children, TermDates, Schedule
 
 from django.db.models import Prefetch
 
@@ -105,9 +105,11 @@ def edit_lesson(request, lessonId):
 
 def book_lesson(request, lessonId):
     lesson = Lesson.objects.get(id=lessonId)
-    form = BookingForm(data=request.POST or None, request=request, instance=lesson)
+    form = ScheduleForm(data=request.POST or None)
     if form.is_valid():
-        lesson = form.save(commit=False)
+        schedule = form.save(commit=False)
+        schedule.lesson = lesson
+        schedule.save()
         lesson.is_confirmed = True
         lesson.save()
         lessonsList = Lesson.objects.all()
@@ -119,10 +121,11 @@ def book_lesson(request, lessonId):
 
 def edit_booking(request, lessonId):
     lesson = Lesson.objects.get(id=lessonId)
-    form = BookingForm(data=request.POST or None, request=request, instance=lesson)
+    schedule = Schedule.objects.get(lesson = lesson)
+    form = ScheduleForm(data=request.POST or None, instance=schedule)
     if form.is_valid():
-        lesson = form.save(commit=False)
-        lesson.save()
+        schedule = form.save(commit=False)
+        schedule.save()
         lessonsList = Lesson.objects.all()
         return render(request, 'admin_lessons.html', {'admin_lessons': lessonsList})
     return render(request, 'update_bookings.html',
@@ -132,7 +135,9 @@ def edit_booking(request, lessonId):
 
 def delete_booking(request, lessonId):
     lesson = Lesson.objects.get(id=lessonId)
+    schedule = Schedule.objects.get(lesson=lesson)
     lesson.delete()
+    schedule.delete()
     lessonsList = Lesson.objects.all()
     return render(request, 'admin_lessons.html', {'admin_lessons': lessonsList})
 
@@ -253,6 +258,7 @@ def log_out(request):
 def invoice_generator(request, lessonId):
     currentUser = request.user
     currentLesson = Lesson.objects.get(id=lessonId)
+    currentSchedule = Schedule.objects.get(lesson=currentLesson)
     lessonCost = 20
     totalCost = lessonCost*currentLesson.lessons
     if currentLesson.invoiceNum == 'default':
@@ -275,8 +281,22 @@ def invoice_generator(request, lessonId):
         "Student_Id": currentLesson.studentNum,
         "Invoice_Id": currentLesson.invoiceNum,
         "Lesson_type": "Type of Instrument",
-        "Number_of_lessons": currentLesson.lessons,
+        "Number_of_lessons": currentSchedule.number_of_lessons,
         "Cost_per_lesson": lessonCost,
         "Total_cost": totalCost,
+        "Invoice_dateAndTime": currentSchedule.time_stamp,
     }
     return render(request, 'invoices.html', information)
+
+def lesson_detail_generator(request, lessonId):
+    currentLesson = Lesson.objects.get(id=lessonId)
+    currentSchedule = Schedule.objects.get(lesson=currentLesson)
+    information = {
+        "Number_of_lessons": currentSchedule.number_of_lessons,
+        "Start_date": currentSchedule.start_date,
+        "Start_time": currentSchedule.start_time,
+        "Interval": currentSchedule.interval,
+        "Duration":currentSchedule.duration,
+        "Teacher":currentSchedule.teacher
+    }
+    return render(request, 'student_timetable.html', information)

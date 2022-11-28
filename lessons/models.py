@@ -2,7 +2,7 @@ from django.db import models
 
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin, User
-from django.core.validators import MaxValueValidator, MinValueValidator 
+from django.core.validators import MaxValueValidator, MinValueValidator
 from msms import settings
 # Create your models here.
 
@@ -65,8 +65,22 @@ class Children(models.Model):
     parent = models.ForeignKey(User, on_delete=models.CASCADE)
 
 class Lesson(models.Model):
-    availabilityDay = models.CharField(max_length=100, blank=False)
-    availabilityTime = models.CharField(max_length=100, blank=False)
+    mondayMorning = models.BooleanField(default=False)
+    mondayAfternoon = models.BooleanField(default=False)
+    mondayNight = models.BooleanField(default=False)
+    tuesdayMorning = models.BooleanField(default=False)
+    tuesdayAfternoon = models.BooleanField(default=False)
+    tuesdayNight = models.BooleanField(default=False)
+    wednesdayMorning = models.BooleanField(default=False)
+    wednesdayAfternoon = models.BooleanField(default=False)
+    wednesdayNight = models.BooleanField(default=False)
+    thursdayMorning = models.BooleanField(default=False)
+    thursdayAfternoon = models.BooleanField(default=False)
+    thursdayNight = models.BooleanField(default=False)
+    fridayMorning = models.BooleanField(default=False)
+    fridayAfternoon = models.BooleanField(default=False)
+    fridayNight = models.BooleanField(default=False)
+
     lessons = models.IntegerField(validators=[MaxValueValidator(4)],blank=False)
     desiredInterval = models.CharField(max_length=100, blank=False)
     duration = models.IntegerField(blank=False)
@@ -82,3 +96,13 @@ class Lesson(models.Model):
 class TermDates(models.Model):
     start_date = models.DateField()
     end_date = models.DateField()
+
+class Schedule(models.Model):
+    teacher = models.CharField(max_length=100)
+    time_stamp = models.DateTimeField(auto_now = True)
+    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
+    start_time = models.TimeField(auto_now = False)
+    start_date = models.DateField(blank=True,null=True)
+    interval = models.IntegerField(blank=True, null=True)
+    number_of_lessons = models.IntegerField(blank=True, null=True)
+    duration = models.IntegerField(blank=True, null=True)

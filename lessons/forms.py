@@ -1,7 +1,7 @@
 from django.core.validators import validate_email
 from django.core.validators import RegexValidator
 from django import forms
-from lessons.models import User, Children, TermDates
+from lessons.models import User, Children, TermDates, Schedule
 from django.utils.safestring import mark_safe
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
@@ -58,31 +58,15 @@ class LessonForm(forms.ModelForm):
         self.fields['children'].queryset = Children.objects.filter(parent=self.request.user)
 
     class Meta:
-        model = Lesson
-        fields = ('children','lessons','availabilityDay','availabilityTime','desiredInterval','duration','furtherInfo','id')
-
-    DAY_CHOICES= [
-    ('',''),
-    ('Monday', 'Monday'),
-    ('Tuesday', 'Tuesday'),
-    ('Wednesday', 'Wednesday'),
-    ('Thursday', 'Thursday'),
-    ('Friday', 'Friday'),
-    ]
-    TIME_CHOICES= [
-    ('',''),
-    ('9:00-10:00', '9:00-10:00'),
-    ('10:00-11:00', '10:00-11:00'),
-    ('11:00-12:00', '11:00-12:00'),
-    ('12:00:13:00', '12:00:13:00'),
-    ('13:00-14:00', '13:00-14:00'),
-    ('14:00-15:00', '14:00-15:00'),
-    ('15:00-16:00', '15:00-16:00'),
-    ('16:00-17:00', '16:00-17:00'),
-    ('17:00-18:00', '17:00-18:00'),
-    ('18:00-19:00', '18:00-19:00'),
-    ('19:00-20:00', '19:00-20:00'),
-    ]
+        model=Lesson
+        fields=('children',
+            'mondayMorning','mondayAfternoon','mondayNight',
+            'tuesdayMorning','tuesdayAfternoon','tuesdayNight',
+            'wednesdayMorning','wednesdayAfternoon','wednesdayNight',
+            'thursdayMorning','thursdayAfternoon','thursdayNight',
+            'fridayMorning','fridayAfternoon','fridayNight',
+            'lessons','desiredInterval','duration','furtherInfo','id',
+            )
 
     INTERVAL_CHOICES= [
     ('',''),
@@ -106,9 +90,21 @@ class LessonForm(forms.ModelForm):
         label=mark_safe("<strong>Select Children</strong>")
     )
 
-    availabilityDay=forms.CharField(label=mark_safe("<strong>Choose your available day:</strong>"),widget=forms.Select(choices=DAY_CHOICES))
-    availabilityTime=forms.CharField(label=mark_safe("<strong>Choose your available time:</strong>"),widget=forms.Select(choices=TIME_CHOICES))
-
+    mondayMorning=forms.BooleanField(required=False,label=mark_safe("<strong>Monday &nbsp&nbsp&nbsp&nbsp&nbsp Morning (8:00 - 12:00)</strong>"))
+    mondayAfternoon=forms.BooleanField(required=False,label=mark_safe("<strong> &nbsp Afternoon (13:00 - 17:00)</strong>"))
+    mondayNight=forms.BooleanField(required=False,label=mark_safe("<strong> &nbsp Night (18:00 - 22:00)</strong>"))
+    tuesdayMorning=forms.BooleanField(required=False,label=mark_safe("<strong>Tuesday &nbsp&nbsp&nbsp&nbsp&nbsp Morning (8:00 - 12:00)</strong>"))
+    tuesdayAfternoon=forms.BooleanField(required=False,label=mark_safe("<strong> &nbsp Afternoon (13:00 - 17:00)</strong>"))
+    tuesdayNight=forms.BooleanField(required=False,label=mark_safe("<strong> &nbsp Night (18:00 - 22:00)</strong>"))
+    wednesdayMorning=forms.BooleanField(required=False,label=mark_safe("<strong>Wednesday Morning (8:00 - 12:00)</strong>"))
+    wednesdayAfternoon=forms.BooleanField(required=False,label=mark_safe("<strong> &nbsp Afternoon (13:00 - 17:00)</strong>"))
+    wednesdayNight=forms.BooleanField(required=False,label=mark_safe("<strong> &nbsp Night (18:00 - 22:00)</strong>"))
+    thursdayMorning=forms.BooleanField(required=False,label=mark_safe("<strong>Thursday &nbsp&nbsp&nbsp&nbsp Morning (8:00 - 12:00)</strong>"))
+    thursdayAfternoon=forms.BooleanField(required=False,label=mark_safe("<strong> &nbsp Afternoon (13:00 - 17:00)</strong>"))
+    thursdayNight=forms.BooleanField(required=False,label=mark_safe("<strong> &nbsp Night (18:00 - 22:00)</strong>"))
+    fridayMorning=forms.BooleanField(required=False,label=mark_safe("<strong>Friday &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Morning (8:00 - 12:00)</strong>"))
+    fridayAfternoon=forms.BooleanField(required=False,label=mark_safe("<strong> &nbsp Afternoon (13:00 - 17:00)</strong>"))
+    fridayNight=forms.BooleanField(required=False,label=mark_safe("<strong> &nbsp Night (18:00 - 22:00)</strong>"))
 
     lessons= forms.IntegerField(label=mark_safe("<strong>Enter the number of lessons</strong>"))
 
@@ -120,69 +116,6 @@ class LessonForm(forms.ModelForm):
 
     furtherInfo=forms.CharField(label=mark_safe("<strong>Add any further information below( (e.g. what do you want to learn or the name of a teacher if you have one in mind)</strong>"),
     widget=forms.Textarea(attrs={'rows':5, 'cols':60}))
-
-class BookingForm(forms.ModelForm):
-
-    def __init__(self, *args, **kwargs):
-        self.request = kwargs.pop('request')
-        super(BookingForm, self).__init__(*args, **kwargs)
-
-    class Meta:
-        model = Lesson
-        fields = ('lessons','availabilityDay','availabilityTime','desiredInterval','duration','furtherInfo','id')
-
-    
-    DAY_CHOICES= [
-    ('',''),
-    ('Monday', 'Monday'),
-    ('Tuesday', 'Tuesday'),
-    ('Wednesday', 'Wednesday'),
-    ('Thursday', 'Thursday'),
-    ('Friday', 'Friday'),
-    ]
-    TIME_CHOICES= [
-    ('',''),
-    ('9:00-10:00', '9:00-10:00'),
-    ('10:00-11:00', '10:00-11:00'),
-    ('11:00-12:00', '11:00-12:00'),
-    ('12:00:13:00', '12:00:13:00'),
-    ('13:00-14:00', '13:00-14:00'),
-    ('14:00-15:00', '14:00-15:00'),
-    ('15:00-16:00', '15:00-16:00'),
-    ('16:00-17:00', '16:00-17:00'),
-    ('17:00-18:00', '17:00-18:00'),
-    ('18:00-19:00', '18:00-19:00'),
-    ('19:00-20:00', '19:00-20:00'),
-    ]
-
-    INTERVAL_CHOICES= [
-    ('',''),
-    ('Once a week', 'Once a week'),
-    ('Once every two weeks', 'Once every two weeks'),
-    ('Once a month', 'Once a month'),
-    ]
-
-    DURATION_CHOICES= [
-    ('',''),
-    ('30', '30'),
-    ('45', '45'),
-    ('60', '60'),
-    ]
-
-    availabilityDay=forms.CharField(label=mark_safe("<strong>Choose your available day:</strong>"),widget=forms.Select(choices=DAY_CHOICES))
-    availabilityTime=forms.CharField(label=mark_safe("<strong>Choose your available time:</strong>"),widget=forms.Select(choices=TIME_CHOICES))
-
-    lessons= forms.IntegerField(label=mark_safe("<strong>Enter the number of lessons</strong>"))
-
-    desiredInterval=forms.CharField(label=mark_safe("<strong>Enter desired interval between lessons</strong>"),
-    widget=forms.Select(choices=INTERVAL_CHOICES))
-
-    duration=forms.IntegerField(label=mark_safe("<strong>Enter duration of the lesson</strong>"),
-    widget=forms.Select(choices=DURATION_CHOICES))
-
-    furtherInfo=forms.CharField(label=mark_safe("<strong>Add any further information below</strong>"),
-    widget=forms.Textarea(attrs={'rows':5, 'cols':60}))
-
 
 class ChildrenForm(forms.ModelForm):
     class Meta:
@@ -197,26 +130,29 @@ class ChildrenForm(forms.ModelForm):
 class DatePickerInput(forms.DateInput):
     input_type = 'date'
 
+class TimePickerInput(forms.TimeInput):
+        input_type = 'time'
+
 class DateForm(forms.ModelForm):
     class Meta:
         model = TermDates
         fields = ('start_date', 'end_date')
-    
-    
-    
+
+
+
     start_date = forms.DateField(widget=DatePickerInput)
     end_date = forms.DateField(widget=DatePickerInput)
 
-    
-    
-    
+
+
+
     def clean_start_date(self, *args, **kwargs):
         start_date = self.cleaned_data.get("start_date")
         for each in TermDates.objects.all():
             if each.start_date <= start_date <= each.end_date and self.instance.pk != each.pk:
                 raise forms.ValidationError("Overlaps with other terms")
         return start_date
-    
+
     def clean_end_date(self, *args, **kwargs):
         end_date = self.cleaned_data.get("end_date")
         start_date = self.cleaned_data.get("start_date")
@@ -228,5 +164,29 @@ class DateForm(forms.ModelForm):
                     raise forms.ValidationError("Overlaps with other terms")
         return end_date
 
+class ScheduleForm(forms.ModelForm):
 
-    
+    class Meta:
+        model = Schedule
+        fields = ('teacher','start_time','start_date','interval','number_of_lessons','duration')
+
+    INTERVAL_CHOICES= [
+    ('',''),
+    ('7', 'Once a week'),
+    ('14', 'Once every two weeks'),
+    ('30', 'Once a month'),
+    ]
+
+    DURATION_CHOICES= [
+    ('',''),
+    ('30', '30'),
+    ('45', '45'),
+    ('60', '60'),
+    ]
+
+    teacher = forms.CharField(label=mark_safe("<strong>Select the teacher</strong>"))
+    start_time = forms.TimeField(label=mark_safe("<strong>Enter the start time</strong>"),widget=TimePickerInput)
+    start_date = forms.DateField(label=mark_safe("<strong>Enter the start date</strong>"),widget=DatePickerInput)
+    number_of_lessons = forms.IntegerField(label=mark_safe("<strong>Enter the number of lessons</strong>"))
+    interval = forms.IntegerField(label=mark_safe("<strong>Enter interval between lessons</strong>"),widget=forms.Select(choices=INTERVAL_CHOICES))
+    duration = forms.IntegerField(label=mark_safe("<strong>Enter duration of the lesson</strong>"),widget=forms.Select(choices=DURATION_CHOICES))
