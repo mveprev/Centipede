@@ -98,11 +98,11 @@ class TermDates(models.Model):
     end_date = models.DateField()
 
 class Schedule(models.Model):
-    teacher = models.CharField(max_length=100)
+    teacher = models.CharField(max_length=100, blank=False)
     time_stamp = models.DateTimeField(auto_now = True)
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
     start_time = models.TimeField(auto_now = False)
-    start_date = models.DateField(blank=True,null=True)
-    interval = models.IntegerField(blank=True, null=True)
-    number_of_lessons = models.IntegerField(blank=True, null=True)
-    duration = models.IntegerField(blank=True, null=True)
+    start_date = models.DateField(blank=False)
+    interval = models.IntegerField(blank=False)
+    number_of_lessons = models.IntegerField(blank=False)
+    duration = models.IntegerField(blank=False)
