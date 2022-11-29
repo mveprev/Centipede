@@ -2,11 +2,70 @@
 {% block student_content %}
 <div class='container'>
     <div class='row'>
-        <div class='col-sm-12 col-md-6 offset-md-3'>
+        <div class='col-md-10 col-md-6 offset-md-2'>
             <h1>Lessons Booking Page for student</h1>
-            <form action = "{% url 'student_landing_page' %}" method="post">
+            <form action = "{% url 'student_landing_page' %}" method="POST">
                 {% csrf_token %}
-                {% include 'partials/bootstrap_form.html' with form=form %}
+                <p>
+                    {{form.children.label}}
+                    {{form.children}}
+                </p>
+                <p>
+                    {{form.mondayMorning.label}}
+                    {{form.mondayMorning}}
+                    {{form.mondayAfternoon.label}}
+                    {{form.mondayAfternoon}}
+                    {{form.mondayNight.label}}
+                    {{form.mondayNight}}
+                </p>
+                <p>
+                    {{form.tuesdayMorning.label}}
+                    {{form.tuesdayMorning}}
+                    {{form.tuesdayAfternoon.label}}
+                    {{form.tuesdayAfternoon}}
+                    {{form.tuesdayNight.label}}
+                    {{form.tuesdayNight}}
+                </p>
+                <p>
+                    {{form.wednesdayMorning.label}}
+                    {{form.wednesdayMorning}}
+                    {{form.wednesdayAfternoon.label}}
+                    {{form.wednesdayAfternoon}}
+                    {{form.wednesdayNight.label}}
+                    {{form.wednesdayNight}}
+                </p>
+                <p>
+                    {{form.thursdayMorning.label}}
+                    {{form.thursdayMorning}}
+                    {{form.thursdayAfternoon.label}}
+                    {{form.thursdayAfternoon}}
+                    {{form.thursdayNight.label}}
+                    {{form.thursdayNight}}
+                </p>
+                <p>
+                    {{form.fridayMorning.label}}
+                    {{form.fridayMorning}}
+                    {{form.fridayAfternoon.label}}
+                    {{form.fridayAfternoon}}
+                    {{form.fridayNight.label}}
+                    {{form.fridayNight}}
+                </p>
+                <p>
+                    {{form.lessons.label}}
+                    {{form.lessons}}
+                </p>
+                <p>
+                    {{form.duration.label}}
+                    {{form.duration}}
+                </p>
+                <p>
+                    {{form.desiredInterval.label}}
+                    {{form.desiredInterval}}
+                </p>
+                <p>
+                    {{form.furtherInfo.label}}
+                    {{form.furtherInfo}}
+                </p>
                 <input type="submit" value="Submit" class='btn btn-primary'>
             </form>
         </div>

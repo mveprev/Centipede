@@ -2,18 +2,45 @@ from django.core.validators import validate_email
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import redirect, render
-from .forms import SignUpForm, LogInForm, LessonForm, BookingForm, ChildrenForm
+from .forms import SignUpForm, LogInForm, LessonForm, ScheduleForm, ChildrenForm
 from .forms import DateForm
-from .models import User, Lesson, Children, TermDates
-
+from .models import User, Lesson, Children, TermDates, Schedule
 from django.db.models import Prefetch
 
+from datetime import datetime
+from django.http import HttpResponse
+from django.views import generic
+from django.utils.safestring import mark_safe
+from .utils import Calendar
 # Create your views here.
 
 
+class CalendarView(generic.ListView):
+    model = Schedule
+    template_name = 'teacher_landing_page.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # use today's date for the calendar
+        d = get_date(self.request.GET.get('day', None))
+
+        # Instantiate our calendar class with today's year and date
+        cal = Calendar(self.request.user, d.year, d.month)
+
+        # Call the formatmonth method, which returns our calendar as a table
+        html_cal = cal.formatmonth(withyear=True)
+        context['calendar'] = mark_safe(html_cal)
+        return context
+
+def get_date(req_day):
+    if req_day:
+        year, month = (int(x) for x in req_day.split('-'))
+        return date(year, month, day=1)
+    return datetime.today()
+
 def home(request):
     return render(request, 'home.html')
-
 
 def student_landing_page(request):
     if request.method == "POST":
@@ -105,9 +132,11 @@ def edit_lesson(request, lessonId):
 
 def book_lesson(request, lessonId):
     lesson = Lesson.objects.get(id=lessonId)
-    form = BookingForm(data=request.POST or None, request=request, instance=lesson)
+    form = ScheduleForm(data=request.POST or None, request=request)
     if form.is_valid():
-        lesson = form.save(commit=False)
+        schedule = form.save(commit=False)
+        schedule.lesson = lesson
+        schedule.save()
         lesson.is_confirmed = True
         lesson.save()
         lessonsList = Lesson.objects.all()
@@ -119,10 +148,11 @@ def book_lesson(request, lessonId):
 
 def edit_booking(request, lessonId):
     lesson = Lesson.objects.get(id=lessonId)
-    form = BookingForm(data=request.POST or None, request=request, instance=lesson)
+    schedule = Schedule.objects.get(lesson = lesson)
+    form = ScheduleForm(data=request.POST or None, instance=schedule, request=request)
     if form.is_valid():
-        lesson = form.save(commit=False)
-        lesson.save()
+        schedule = form.save(commit=False)
+        schedule.save()
         lessonsList = Lesson.objects.all()
         return render(request, 'admin_lessons.html', {'admin_lessons': lessonsList})
     return render(request, 'update_bookings.html',
@@ -132,7 +162,9 @@ def edit_booking(request, lessonId):
 
 def delete_booking(request, lessonId):
     lesson = Lesson.objects.get(id=lessonId)
+    schedule = Schedule.objects.get(lesson=lesson)
     lesson.delete()
+    schedule.delete()
     lessonsList = Lesson.objects.all()
     return render(request, 'admin_lessons.html', {'admin_lessons': lessonsList})
 
@@ -205,6 +237,9 @@ def log_in(request):
                 if user.is_staff:
                     login(request, user)
                     return redirect('admin_landing_page')
+                if user.is_teacher:
+                    login(request, user)
+                    return redirect('teacher_landing_page')
                 login(request, user)
                 return redirect('student_landing_page')
         # Add error message here
@@ -253,6 +288,7 @@ def log_out(request):
 def invoice_generator(request, lessonId):
     currentUser = request.user
     currentLesson = Lesson.objects.get(id=lessonId)
+    currentSchedule = Schedule.objects.get(lesson=currentLesson)
     lessonCost = 20
     totalCost = lessonCost*currentLesson.lessons
     if currentLesson.invoiceNum == 'default':
@@ -275,8 +311,22 @@ def invoice_generator(request, lessonId):
         "Student_Id": currentLesson.studentNum,
         "Invoice_Id": currentLesson.invoiceNum,
         "Lesson_type": "Type of Instrument",
-        "Number_of_lessons": currentLesson.lessons,
+        "Number_of_lessons": currentSchedule.number_of_lessons,
         "Cost_per_lesson": lessonCost,
         "Total_cost": totalCost,
+        "Invoice_dateAndTime": currentSchedule.time_stamp,
     }
     return render(request, 'invoices.html', information)
+
+def lesson_detail_generator(request, lessonId):
+    currentLesson = Lesson.objects.get(id=lessonId)
+    currentSchedule = Schedule.objects.get(lesson=currentLesson)
+    information = {
+        "Number_of_lessons": currentSchedule.number_of_lessons,
+        "Start_date": currentSchedule.start_date,
+        "Start_time": currentSchedule.start_time,
+        "Interval": currentSchedule.interval,
+        "Duration":currentSchedule.duration,
+        "Teacher":currentSchedule.teacher
+    }
+    return render(request, 'student_timetable.html', information)
