@@ -74,7 +74,7 @@ class TermDates(models.Model):
 
 class Lesson(models.Model):
     term = models.ForeignKey(TermDates, on_delete=models.CASCADE, null=True)
-    
+
     mondayMorning = models.BooleanField(default=False)
     mondayAfternoon = models.BooleanField(default=False)
     mondayNight = models.BooleanField(default=False)
@@ -112,7 +112,11 @@ class Schedule(models.Model):
     interval = models.IntegerField(blank=False)
     number_of_lessons = models.IntegerField(blank=False)
     duration = models.IntegerField(blank=False)
-<<<<<<< HEAD
+
+class Renewal(models.Model):
+    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
+    renew = models.BooleanField(default=True)
+    renewDate = models.DateField(lesson.term.end_date)
 
 class Payment(models.Model):
     payment_time = models.DateTimeField(auto_now = True)
@@ -120,10 +124,3 @@ class Payment(models.Model):
     amount_paid = models.IntegerField(blank=False)
     balance_before = models.IntegerField(default=0, blank=False)
     balance_after = models.IntegerField(default=0, blank=False)
-=======
-    
-class Renewal(models.Model):
-    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
-    renew = models.BooleanField(default=True)
-    #renewDate = models.DateField(lesson.term.end_date)
->>>>>>> main

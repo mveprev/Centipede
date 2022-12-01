@@ -208,19 +208,16 @@ class ScheduleForm(forms.ModelForm):
     number_of_lessons = forms.IntegerField(label=mark_safe("<strong>Enter the number of lessons</strong>"))
     interval = forms.IntegerField(label=mark_safe("<strong>Enter interval between lessons</strong>"),widget=forms.Select(choices=INTERVAL_CHOICES))
     duration = forms.IntegerField(label=mark_safe("<strong>Enter duration of the lesson</strong>"),widget=forms.Select(choices=DURATION_CHOICES))
-<<<<<<< HEAD
+
+class RenewForm(forms.ModelForm):
+    class Meta:
+        model = Renewal
+        fields = ('renew')
+
+    renew = forms.BooleanField(label=mark_safe("<strong>Renew</strong>"))
 
 class PaymentForm(forms.ModelForm):
     class Meta:
         model = Payment
         fields = ('amount_paid',)
     amount_paid = forms.IntegerField(label=mark_safe("<strong>Enter the amount paid</strong>"))
-=======
-
-#class RenewForm(forms.ModelForm):
-    #class Meta:
-        #model = Renewal
-        #fields = ('renew')
-
-    #renew = forms.BooleanField(label=mark_safe("<strong>Renew</strong>"))
->>>>>>> main
