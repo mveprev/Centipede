@@ -23,6 +23,7 @@ class UserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', False)
         extra_fields.setdefault('is_superuser', False)
+        extra_fields.setdefault('outstanding_balance', 0)
         return self._create_user(email, password, **extra_fields)
 
     def create_superuser(self, email, password, **extra_fields):
@@ -53,6 +54,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False, verbose_name='administrator')
     is_superuser = models.BooleanField(default=False, verbose_name='director')
     is_active = models.BooleanField(default=True, verbose_name='active')
+    outstanding_balance = models.IntegerField(default=0, blank=False)
 
     objects = UserManager()
     USERNAME_FIELD = 'email'
@@ -107,3 +109,10 @@ class Schedule(models.Model):
     interval = models.IntegerField(blank=False)
     number_of_lessons = models.IntegerField(blank=False)
     duration = models.IntegerField(blank=False)
+
+class Payment(models.Model):
+    payment_time = models.DateTimeField(auto_now = True)
+    student = models.ForeignKey(User, on_delete=models.CASCADE)
+    amount_paid = models.IntegerField(blank=False)
+    balance_before = models.IntegerField(default=0, blank=False)
+    balance_after = models.IntegerField(default=0, blank=False)

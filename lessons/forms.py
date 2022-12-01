@@ -1,7 +1,7 @@
 from django.core.validators import validate_email
 from django.core.validators import RegexValidator
 from django import forms
-from lessons.models import User, Children, TermDates, Schedule
+from lessons.models import User, Children, TermDates, Schedule, Payment
 from django.utils.safestring import mark_safe
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
@@ -196,3 +196,9 @@ class ScheduleForm(forms.ModelForm):
     number_of_lessons = forms.IntegerField(label=mark_safe("<strong>Enter the number of lessons</strong>"))
     interval = forms.IntegerField(label=mark_safe("<strong>Enter interval between lessons</strong>"),widget=forms.Select(choices=INTERVAL_CHOICES))
     duration = forms.IntegerField(label=mark_safe("<strong>Enter duration of the lesson</strong>"),widget=forms.Select(choices=DURATION_CHOICES))
+
+class PaymentForm(forms.ModelForm):
+    class Meta:
+        model = Payment
+        fields = ('amount_paid',)
+    amount_paid = forms.IntegerField(label=mark_safe("<strong>Enter the amount paid</strong>"))

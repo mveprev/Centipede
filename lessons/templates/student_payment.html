@@ -5,6 +5,33 @@
         <div class='col-sm-12 col-md-6 offset-md-3'>
             <h1>Payment Page for student</h1>
             <p><b>UNDER CONSTRUCTION</b>: In this page user can access payment info.</p>
+            <strong>Your outstanding balance:</strong>
+            <p>{{student.outstanding_balance}}</p>
+            <strong>Your payments:</strong>
+            <!--Makes the table that will display payment-->
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Amount</th>
+                  <th scope="col">Time</th>
+                  <th scope="col">Balance before</th>
+                  <th scope="col">Balance after</th>
+                </tr>
+              </thead>
+              <tbody>
+                <div class="Payment">
+                  <!--For loop goes through every student
+                  And adds it to the table.-->
+                  {% for Payment in student_payment %}
+                    <tr>
+                      <td>{{Payment.amount_paid}}</td>
+                      <td>{{Payment.payment_time}}</td>
+                      <td>{{Payment.balance_before}}</td>
+                      <td>{{Payment.balance_after}}</td>
+                    </tr>
+                  {% endfor%}
+              </tbody>
+          </table>
         </div>
     </div>
 </div>

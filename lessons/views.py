@@ -2,9 +2,9 @@ from django.core.validators import validate_email
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import redirect, render
-from .forms import SignUpForm, LogInForm, LessonForm, ScheduleForm, ChildrenForm
+from .forms import SignUpForm, LogInForm, LessonForm, ScheduleForm, ChildrenForm, PaymentForm
 from .forms import DateForm
-from .models import User, Lesson, Children, TermDates, Schedule
+from .models import User, Lesson, Children, TermDates, Schedule, Payment
 from django.db.models import Prefetch
 
 from datetime import datetime
@@ -138,7 +138,20 @@ def book_lesson(request, lessonId):
         schedule.lesson = lesson
         schedule.save()
         lesson.is_confirmed = True
+        lesson.lessons = schedule.number_of_lessons
+        lesson.duration = schedule.duration
+        if schedule.interval == '7':
+            lesson.desiredInterval = 'Once a week'
+        elif schedule.interval == '14':
+            lesson.desiredInterval = 'Once every two weeks'
+        elif schedule.interval == '30':
+            lesson.desiredInterval = 'Once a month'
         lesson.save()
+        user = lesson.user
+        lessonCost = 20
+        totalCost = lessonCost*schedule.number_of_lessons
+        user.outstanding_balance += totalCost
+        user.save()
         lessonsList = Lesson.objects.all()
         return render(request, 'admin_lessons.html', {'admin_lessons': lessonsList})
     return render(request, 'book_lessons.html',
@@ -149,10 +162,31 @@ def book_lesson(request, lessonId):
 def edit_booking(request, lessonId):
     lesson = Lesson.objects.get(id=lessonId)
     schedule = Schedule.objects.get(lesson = lesson)
+    lessonCost = 20
+    initialLessons = schedule.number_of_lessons
+    initialCost = lessonCost*initialLessons
     form = ScheduleForm(data=request.POST or None, instance=schedule, request=request)
     if form.is_valid():
         schedule = form.save(commit=False)
         schedule.save()
+        lesson.lessons = schedule.number_of_lessons
+        lesson.duration = schedule.duration
+        if schedule.interval == '7':
+            lesson.desiredInterval = 'Once a week'
+        elif schedule.interval == '14':
+            lesson.desiredInterval = 'Once every two weeks'
+        elif schedule.interval == '30':
+            lesson.desiredInterval = 'Once a month'
+        lesson.save()
+        newLessons = schedule.number_of_lessons
+        user = lesson.user
+        if newLessons < initialLessons:
+            differenceCost = initialCost - (lessonCost*newLessons)
+            user.outstanding_balance -= differenceCost
+        elif newLessons > initialLessons:
+            differenceCost = (lessonCost*newLessons) - initialCost
+            user.outstanding_balance += differenceCost
+        user.save()
         lessonsList = Lesson.objects.all()
         return render(request, 'admin_lessons.html', {'admin_lessons': lessonsList})
     return render(request, 'update_bookings.html',
@@ -163,6 +197,11 @@ def edit_booking(request, lessonId):
 def delete_booking(request, lessonId):
     lesson = Lesson.objects.get(id=lessonId)
     schedule = Schedule.objects.get(lesson=lesson)
+    lessonCost = 20
+    totalCost = lessonCost*schedule.number_of_lessons
+    user = lesson.user
+    user.outstanding_balance -= totalCost
+    user.save()
     lesson.delete()
     schedule.delete()
     lessonsList = Lesson.objects.all()
@@ -203,15 +242,20 @@ def delete_children(request, childrenId):
 
 
 def student_payment(request):
-    return render(request, 'student_payment.html')
-
+    if request.user.is_authenticated:
+        currentUser = request.user
+        paymentList = Payment.objects.filter(student=currentUser).order_by('-payment_time')
+        return render(request, 'student_payment.html', {'student': currentUser, 'student_payment': paymentList})
+    else:
+        return render(request, 'home.html')
 
 def admin_landing_page(request):
     return render(request, 'admin_landing_page.html')
 
 
 def admin_payment(request):
-    return render(request, 'admin_payment.html')
+    studentList = User.objects.filter(is_teacher = False, is_staff = False, is_superuser = False)
+    return render(request, 'admin_payment.html', {'admin_payment': studentList})
 
 
 def sign_up(request):
@@ -290,7 +334,7 @@ def invoice_generator(request, lessonId):
     currentLesson = Lesson.objects.get(id=lessonId)
     currentSchedule = Schedule.objects.get(lesson=currentLesson)
     lessonCost = 20
-    totalCost = lessonCost*currentLesson.lessons
+    totalCost = lessonCost*currentSchedule.number_of_lessons
     if currentLesson.invoiceNum == 'default':
         currentLesson.invoiceNum = (str(currentUser.pk)[:4]).zfill(4) + "-" + (str(currentLesson.pk)[:4]).zfill(4)
         currentLesson.save()
@@ -330,3 +374,22 @@ def lesson_detail_generator(request, lessonId):
         "Teacher":currentSchedule.teacher
     }
     return render(request, 'student_timetable.html', information)
+
+def make_payment(request, userId):
+    student = User.objects.get(id=userId)
+    form = PaymentForm(data=request.POST or None)
+    if form.is_valid():
+        payment = form.save(commit=False)
+        payment.student = student
+        payment.save()
+        amount_paid = payment.amount_paid
+        payment.balance_before = student.outstanding_balance
+        student.outstanding_balance -= amount_paid
+        student.save()
+        payment.balance_after = student.outstanding_balance
+        payment.save()
+        studentList = User.objects.filter(is_teacher = False, is_staff = False, is_superuser = False)
+        return render(request, 'admin_payment.html', {'admin_payment': studentList})
+    return render(request, 'make_payment.html',
+                  {'student': student,
+                   'form': form})

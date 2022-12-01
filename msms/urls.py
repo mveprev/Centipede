@@ -43,5 +43,6 @@ urlpatterns = [
     path('edit_booking/<lessonId>', views.edit_booking, name='edit-booking'),
     path('delete_booking/<lessonId>', views.delete_booking, name='delete-booking'),
     path('invoices/<lessonId>', views.invoice_generator, name='invoices'),
-    path('student_timetable/<lessonId>', views.lesson_detail_generator, name='student_timetable')
+    path('student_timetable/<lessonId>', views.lesson_detail_generator, name='student_timetable'),
+    path('make_payment/<userId>', views.make_payment, name='make_payment')
 ]

@@ -5,6 +5,32 @@
         <div class='col-sm-12 col-md-6 offset-md-3'>
             <h1>Payment Page for admin</h1>
             <p><b>UNDER CONSTRUCTION</b>: In this page user can access payment info.</p>
+
+            <!--Makes the table that will display students-->
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Student</th>
+                  <th scope="col">Balance</th>
+                </tr>
+              </thead>
+              <tbody>
+                <div class="User">
+                  <!--For loop goes through every student
+                  And adds it to the table.-->
+                  {% for User in admin_payment %}
+                    <tr>
+                      <td>{{User.first_name}} {{' '}} {{User.last_name}}</td>
+                      <td>{{User.outstanding_balance}}</td>
+                      <th scope="col">
+                        <a class="btn btn-primary btn-sm"
+                        href="{% url 'make_payment' User.id %}"
+                        role="button"
+                        >Payment</a></th>
+                    </tr>
+                  {% endfor%}
+              </tbody>
+          </table>
         </div>
     </div>
 </div>
