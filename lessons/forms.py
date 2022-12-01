@@ -1,10 +1,11 @@
 from django.core.validators import validate_email
 from django.core.validators import RegexValidator
 from django import forms
-from lessons.models import User, Children, TermDates, Schedule, Payment
+from lessons.models import User, Children, TermDates, Schedule, Renewal, Payment
 from django.utils.safestring import mark_safe
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
+import datetime
 
 from .models import Lesson
 
@@ -50,16 +51,18 @@ class CustomLessonForm(forms.ModelChoiceField):
     def label_from_instance(self, children):
         return children.first_name + ' ' + children.last_name
 
+
 class LessonForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop('request')
         super(LessonForm, self).__init__(*args, **kwargs)
         self.fields['children'].queryset = Children.objects.filter(parent=self.request.user)
+        self.fields['term'].queryset = TermDates.objects.all()
 
     class Meta:
         model=Lesson
-        fields=('children',
+        fields=('term', 'children',
             'mondayMorning','mondayAfternoon','mondayNight',
             'tuesdayMorning','tuesdayAfternoon','tuesdayNight',
             'wednesdayMorning','wednesdayAfternoon','wednesdayNight',
@@ -81,6 +84,14 @@ class LessonForm(forms.ModelForm):
     ('45', '45'),
     ('60', '60'),
     ]
+
+    term = forms.ModelChoiceField(
+        queryset=None,
+        empty_label='------------ Please select term ------------',
+        required=True,
+        widget=forms.Select,
+        label=mark_safe("<strong>Select Term</strong>")
+    )
 
     children = CustomLessonForm(
         queryset=None,
@@ -133,10 +144,11 @@ class TimePickerInput(forms.TimeInput):
 class DateForm(forms.ModelForm):
     class Meta:
         model = TermDates
-        fields = ('start_date', 'end_date')
+        fields = ('name', 'start_date', 'end_date')
 
     start_date = forms.DateField(widget=DatePickerInput)
     end_date = forms.DateField(widget=DatePickerInput)
+
 
     def clean_start_date(self, *args, **kwargs):
         start_date = self.cleaned_data.get("start_date")
@@ -196,9 +208,19 @@ class ScheduleForm(forms.ModelForm):
     number_of_lessons = forms.IntegerField(label=mark_safe("<strong>Enter the number of lessons</strong>"))
     interval = forms.IntegerField(label=mark_safe("<strong>Enter interval between lessons</strong>"),widget=forms.Select(choices=INTERVAL_CHOICES))
     duration = forms.IntegerField(label=mark_safe("<strong>Enter duration of the lesson</strong>"),widget=forms.Select(choices=DURATION_CHOICES))
+<<<<<<< HEAD
 
 class PaymentForm(forms.ModelForm):
     class Meta:
         model = Payment
         fields = ('amount_paid',)
     amount_paid = forms.IntegerField(label=mark_safe("<strong>Enter the amount paid</strong>"))
+=======
+
+#class RenewForm(forms.ModelForm):
+    #class Meta:
+        #model = Renewal
+        #fields = ('renew')
+
+    #renew = forms.BooleanField(label=mark_safe("<strong>Renew</strong>"))
+>>>>>>> main

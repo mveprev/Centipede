@@ -67,7 +67,14 @@ class Children(models.Model):
     id = models.AutoField(primary_key=True, unique=True)
     parent = models.ForeignKey(User, on_delete=models.CASCADE)
 
+class TermDates(models.Model):
+    name = models.CharField(max_length = 50, default = 'default', unique=True)
+    start_date = models.DateField()
+    end_date = models.DateField()
+
 class Lesson(models.Model):
+    term = models.ForeignKey(TermDates, on_delete=models.CASCADE, null=True)
+    
     mondayMorning = models.BooleanField(default=False)
     mondayAfternoon = models.BooleanField(default=False)
     mondayNight = models.BooleanField(default=False)
@@ -96,10 +103,6 @@ class Lesson(models.Model):
     studentNum = models.CharField(max_length = 50, default = 'default')
     invoiceEmail = models.CharField(max_length = 50, default = 'default')
 
-class TermDates(models.Model):
-    start_date = models.DateField()
-    end_date = models.DateField()
-
 class Schedule(models.Model):
     time_stamp = models.DateTimeField(auto_now = True)
     teacher = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -109,6 +112,7 @@ class Schedule(models.Model):
     interval = models.IntegerField(blank=False)
     number_of_lessons = models.IntegerField(blank=False)
     duration = models.IntegerField(blank=False)
+<<<<<<< HEAD
 
 class Payment(models.Model):
     payment_time = models.DateTimeField(auto_now = True)
@@ -116,3 +120,10 @@ class Payment(models.Model):
     amount_paid = models.IntegerField(blank=False)
     balance_before = models.IntegerField(default=0, blank=False)
     balance_after = models.IntegerField(default=0, blank=False)
+=======
+    
+class Renewal(models.Model):
+    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
+    renew = models.BooleanField(default=True)
+    #renewDate = models.DateField(lesson.term.end_date)
+>>>>>>> main

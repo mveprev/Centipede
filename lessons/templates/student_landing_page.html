@@ -7,6 +7,10 @@
             <form action = "{% url 'student_landing_page' %}" method="POST">
                 {% csrf_token %}
                 <p>
+                  {{form.term.label}}
+                  {{form.term}}
+                </p>
+                <p>
                     {{form.children.label}}
                     {{form.children}}
                 </p>
