@@ -168,6 +168,9 @@ def delete_booking(request, lessonId):
     lessonsList = Lesson.objects.all()
     return render(request, 'admin_lessons.html', {'admin_lessons': lessonsList})
 
+def renew_lesson(request, lessonId):
+    lesson = Lesson.objects.get(id=lessonId)
+    return render(request, 'student_renewal_settings.html', {'lesson': lesson})
 
 def add_children(request):
     if request.method == "POST":
