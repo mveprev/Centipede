@@ -7,11 +7,12 @@ from .forms import DateForm
 from .models import User, Lesson, Children, TermDates, Schedule
 from django.db.models import Prefetch
 
-from datetime import datetime
+from datetime import datetime, timedelta, date
 from django.http import HttpResponse
 from django.views import generic
 from django.utils.safestring import mark_safe
 from .utils import Calendar
+import calendar
 # Create your views here.
 
 
@@ -21,17 +22,26 @@ class CalendarView(generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        # use today's date for the calendar
-        d = get_date(self.request.GET.get('day', None))
-
-        # Instantiate our calendar class with today's year and date
+        d = get_date(self.request.GET.get('month', None))
         cal = Calendar(self.request.user, d.year, d.month)
-
-        # Call the formatmonth method, which returns our calendar as a table
         html_cal = cal.formatmonth(withyear=True)
         context['calendar'] = mark_safe(html_cal)
+        context['prev_month'] = prev_month(d)
+        context['next_month'] = next_month(d)
         return context
+
+def prev_month(d):
+    first = d.replace(day=1)
+    prev_month = first - timedelta(days=1)
+    month = 'month=' + str(prev_month.year) + '-' + str(prev_month.month)
+    return month
+
+def next_month(d):
+    days_in_month = calendar.monthrange(d.year, d.month)[1]
+    last = d.replace(day=days_in_month)
+    next_month = last + timedelta(days=1)
+    month = 'month=' + str(next_month.year) + '-' + str(next_month.month)
+    return month
 
 def get_date(req_day):
     if req_day:
@@ -137,6 +147,17 @@ def book_lesson(request, lessonId):
         schedule = form.save(commit=False)
         schedule.lesson = lesson
         schedule.save()
+        for i in range (1,schedule.number_of_lessons):
+            newSchedule = Schedule.objects.create(
+                teacher = schedule.teacher,
+                lesson = schedule.lesson,
+                start_time = schedule.start_time,
+                start_date = schedule.start_date + timedelta(days = i*schedule.interval),
+                interval = schedule.interval,
+                number_of_lessons = schedule.number_of_lessons,
+                duration = schedule.duration,
+            )
+            newSchedule.save()
         lesson.is_confirmed = True
         lesson.save()
         lessonsList = Lesson.objects.all()
@@ -148,11 +169,23 @@ def book_lesson(request, lessonId):
 
 def edit_booking(request, lessonId):
     lesson = Lesson.objects.get(id=lessonId)
-    schedule = Schedule.objects.get(lesson = lesson)
+    schedules = Schedule.objects.filter(lesson = lesson)
+    schedule = schedules.first()
     form = ScheduleForm(data=request.POST or None, instance=schedule, request=request)
     if form.is_valid():
         schedule = form.save(commit=False)
         schedule.save()
+        i = 1
+        for x in schedules:
+            x.teacher = schedule.teacher
+            x.lesson = schedule.lesson
+            x.start_time = schedule.start_time
+            x.start_date = schedule.start_date + timedelta(days = i*schedule.interval)
+            x.interval = schedule.interval
+            x.number_of_lessons = schedule.number_of_lessons
+            x.duration = schedule.duration
+            x.save()
+            i+=1
         lessonsList = Lesson.objects.all()
         return render(request, 'admin_lessons.html', {'admin_lessons': lessonsList})
     return render(request, 'update_bookings.html',
@@ -162,7 +195,7 @@ def edit_booking(request, lessonId):
 
 def delete_booking(request, lessonId):
     lesson = Lesson.objects.get(id=lessonId)
-    schedule = Schedule.objects.get(lesson=lesson)
+    schedule = Schedule.objects.filter(lesson=lesson)
     lesson.delete()
     schedule.delete()
     lessonsList = Lesson.objects.all()
@@ -288,7 +321,8 @@ def log_out(request):
 def invoice_generator(request, lessonId):
     currentUser = request.user
     currentLesson = Lesson.objects.get(id=lessonId)
-    currentSchedule = Schedule.objects.get(lesson=currentLesson)
+    schedules = Schedule.objects.filter(lesson=currentLesson)
+    currentSchedule = schedules.first()
     lessonCost = 20
     totalCost = lessonCost*currentLesson.lessons
     if currentLesson.invoiceNum == 'default':
@@ -320,7 +354,8 @@ def invoice_generator(request, lessonId):
 
 def lesson_detail_generator(request, lessonId):
     currentLesson = Lesson.objects.get(id=lessonId)
-    currentSchedule = Schedule.objects.get(lesson=currentLesson)
+    schedules = Schedule.objects.filter(lesson=currentLesson)
+    currentSchedule = schedules.first()
     information = {
         "Number_of_lessons": currentSchedule.number_of_lessons,
         "Start_date": currentSchedule.start_date,
