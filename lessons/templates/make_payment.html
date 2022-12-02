@@ -1,0 +1,19 @@
+{% extends 'admin_base_content.html' %}
+{% block admin_content %}
+<div class='container'>
+    <div class='row'>
+        <div class='col-sm-12 col-md-6 offset-md-3'>
+            <strong>Student:</strong>
+            <p>{{student.first_name}} {{' '}} {{student.last_name}}</p>
+            <strong>Balance:</strong>
+            <p>{{student.outstanding_balance}}</p>
+            <p><b>
+              <form action="" method=POST>
+              {% csrf_token %}
+              {% include 'partials/bootstrap_form.html' with form=form %}
+            </b></p>
+            <input class="btn btn-primary" type="submit" value="Submit">
+        </div>
+    </div>
+</div>
+{% endblock %}

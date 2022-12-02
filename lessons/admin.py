@@ -5,7 +5,7 @@ from .models import TermDates, Schedule
 
 # Register your models here.
 admin.site.enable_nav_sidebar = False
-admin.site.site_header = 'Music Scool Director'
+admin.site.site_header = 'Music School Director'
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):

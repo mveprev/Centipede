@@ -1,7 +1,7 @@
 from django.core.validators import validate_email
-from django.core.validators import RegexValidator
+from django.core.validators import RegexValidator, MinValueValidator
 from django import forms
-from lessons.models import User, Children, TermDates, Schedule, Renewal
+from lessons.models import User, Children, TermDates, Schedule, Renewal, Payment
 from django.utils.safestring import mark_safe
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
@@ -84,7 +84,7 @@ class LessonForm(forms.ModelForm):
     ('45', '45'),
     ('60', '60'),
     ]
-    
+
     term = forms.ModelChoiceField(
         queryset=None,
         empty_label='------------ Please select term ------------',
@@ -148,7 +148,7 @@ class DateForm(forms.ModelForm):
 
     start_date = forms.DateField(widget=DatePickerInput)
     end_date = forms.DateField(widget=DatePickerInput)
-    
+
 
     def clean_start_date(self, *args, **kwargs):
         start_date = self.cleaned_data.get("start_date")
@@ -208,10 +208,17 @@ class ScheduleForm(forms.ModelForm):
     number_of_lessons = forms.IntegerField(label=mark_safe("<strong>Enter the number of lessons</strong>"))
     interval = forms.IntegerField(label=mark_safe("<strong>Enter interval between lessons</strong>"),widget=forms.Select(choices=INTERVAL_CHOICES))
     duration = forms.IntegerField(label=mark_safe("<strong>Enter duration of the lesson</strong>"),widget=forms.Select(choices=DURATION_CHOICES))
-    
-#class RenewForm(forms.ModelForm):
-    #class Meta:
-        #model = Renewal
-        #fields = ('renew')
-        
-    #renew = forms.BooleanField(label=mark_safe("<strong>Renew</strong>"))
+
+class RenewForm(forms.ModelForm):
+    class Meta:
+        model = Renewal
+        fields = ('renew',)
+
+    renew = forms.BooleanField(label=mark_safe("<strong>Renew</strong>"))
+
+class PaymentForm(forms.ModelForm):
+    class Meta:
+        model = Payment
+        fields = ('amount_paid',)
+    amount_paid = forms.IntegerField(validators=[MinValueValidator(limit_value=1, message = "Amount paid must be a positive integer.")],
+                                    label=mark_safe("<strong>Enter the amount paid</strong>"))
