@@ -209,7 +209,7 @@ def edit_booking(request, lessonId):
             differenceCost = (lessonCost*newLessons) - initialCost
             user.outstanding_balance -= differenceCost
         user.save()
-        i = 1
+        i = 0
         for x in schedules:
             x.teacher = schedule.teacher
             x.lesson = schedule.lesson
