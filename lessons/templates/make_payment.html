@@ -10,7 +10,7 @@
             <p><b>
               <form action="" method=POST>
               {% csrf_token %}
-              {{form.as_p}}
+              {% include 'partials/bootstrap_form.html' with form=form %}
             </b></p>
             <input class="btn btn-primary" type="submit" value="Submit">
         </div>

@@ -116,7 +116,7 @@ class Schedule(models.Model):
 class Renewal(models.Model):
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
     renew = models.BooleanField(default=True)
-    renewDate = models.DateField(lesson.term.end_date)
+    #renewDate = models.DateField(lesson.term.end_date)
 
 class Payment(models.Model):
     payment_time = models.DateTimeField(auto_now = True)

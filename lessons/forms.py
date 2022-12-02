@@ -1,5 +1,5 @@
 from django.core.validators import validate_email
-from django.core.validators import RegexValidator
+from django.core.validators import RegexValidator, MinValueValidator
 from django import forms
 from lessons.models import User, Children, TermDates, Schedule, Renewal, Payment
 from django.utils.safestring import mark_safe
@@ -212,7 +212,7 @@ class ScheduleForm(forms.ModelForm):
 class RenewForm(forms.ModelForm):
     class Meta:
         model = Renewal
-        fields = ('renew')
+        fields = ('renew',)
 
     renew = forms.BooleanField(label=mark_safe("<strong>Renew</strong>"))
 
@@ -220,4 +220,5 @@ class PaymentForm(forms.ModelForm):
     class Meta:
         model = Payment
         fields = ('amount_paid',)
-    amount_paid = forms.IntegerField(label=mark_safe("<strong>Enter the amount paid</strong>"))
+    amount_paid = forms.IntegerField(validators=[MinValueValidator(limit_value=1, message = "Amount paid must be a positive integer.")],
+                                    label=mark_safe("<strong>Enter the amount paid</strong>"))

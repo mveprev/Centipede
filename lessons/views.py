@@ -150,7 +150,7 @@ def book_lesson(request, lessonId):
         user = lesson.user
         lessonCost = 20
         totalCost = lessonCost*schedule.number_of_lessons
-        user.outstanding_balance += totalCost
+        user.outstanding_balance -= totalCost
         user.save()
         lessonsList = Lesson.objects.all()
         return render(request, 'admin_lessons.html', {'admin_lessons': lessonsList})
@@ -182,10 +182,10 @@ def edit_booking(request, lessonId):
         user = lesson.user
         if newLessons < initialLessons:
             differenceCost = initialCost - (lessonCost*newLessons)
-            user.outstanding_balance -= differenceCost
+            user.outstanding_balance += differenceCost
         elif newLessons > initialLessons:
             differenceCost = (lessonCost*newLessons) - initialCost
-            user.outstanding_balance += differenceCost
+            user.outstanding_balance -= differenceCost
         user.save()
         lessonsList = Lesson.objects.all()
         return render(request, 'admin_lessons.html', {'admin_lessons': lessonsList})
@@ -200,7 +200,7 @@ def delete_booking(request, lessonId):
     lessonCost = 20
     totalCost = lessonCost*schedule.number_of_lessons
     user = lesson.user
-    user.outstanding_balance -= totalCost
+    user.outstanding_balance += totalCost
     user.save()
     lesson.delete()
     schedule.delete()
@@ -387,7 +387,7 @@ def make_payment(request, userId):
         payment.save()
         amount_paid = payment.amount_paid
         payment.balance_before = student.outstanding_balance
-        student.outstanding_balance -= amount_paid
+        student.outstanding_balance += amount_paid
         student.save()
         payment.balance_after = student.outstanding_balance
         payment.save()
