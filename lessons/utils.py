@@ -13,7 +13,7 @@ class Calendar(HTMLCalendar):
         events_per_day = schedules.filter(start_date__day=day).order_by('start_time')
         d = ''
         for event in events_per_day:
-            d += f'<li> {event.start_time} {event.duration} minutes</li>'
+            d += f'<li>{event.start_time} {event.duration}min</li>'
         if day != 0:
             return f"<td><span class='date'>{day}</span><ul> {d} </ul></td>"
         return '<td></td>'
