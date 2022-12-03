@@ -1,9 +1,10 @@
 from django.core.management.base import BaseCommand, CommandError
 from faker import Faker
 import faker.providers
-from lessons.models import UserManager, User, Lesson, TermDates, Children
+from lessons.models import UserManager, User, Lesson, TermDates, Children, Schedule, Payment
 import random
 import datetime
+from datetime import date, time
 from django.contrib.auth.hashers import make_password
 
 
@@ -44,6 +45,9 @@ TERMS = [
     1,
     2,
     3,
+    4,
+    5,
+    6
 ]
 
 LESSON_NUMBER = [
@@ -104,7 +108,6 @@ class Command(BaseCommand):
 
 # Function to create and input the dummy data.
 
-
     def handle(self, *args, **options):
         # print("The seed command has not been implemented yet!")
         # print("TO DO: Create a seed command following the instructions of the assignment carefully.")
@@ -133,6 +136,24 @@ class Command(BaseCommand):
             name="Term 3",
             start_date=datetime.date(2023, 5, 13),
             end_date=datetime.date(2023, 7, 30),
+        )
+
+        term4 = TermDates.objects.create(
+            name="Term 4",
+            start_date=datetime.date(2023, 8, 13),
+            end_date=datetime.date(2023, 9, 30),
+        )
+
+        term5 = TermDates.objects.create(
+            name="Term 5",
+            start_date=datetime.date(2023, 10, 13),
+            end_date=datetime.date(2023, 11, 30),
+        )
+
+        term6 = TermDates.objects.create(
+            name="Term 6",
+            start_date=datetime.date(2023, 12, 13),
+            end_date=datetime.date(2024, 1, 30),
         )
 
         # Model Teacher
@@ -200,7 +221,7 @@ class Command(BaseCommand):
 
         # Creation of lesson for deafult user John Doe
 
-        Lesson.objects.create(
+        johnDoeLesson = Lesson.objects.create(
             term=term1,
             mondayMorning=True,
             lessons=2,
@@ -209,11 +230,38 @@ class Command(BaseCommand):
             furtherInfo="I want to learn piano",
             id=10,
             user=john,
-            is_confirmed=False,
-            invoiceNum=(str(john.pk)[:4]).zfill(4),
-            studentNum=(str(1)[:4]).zfill(4),
+            is_confirmed=True,
+            invoiceNum=(str(john.pk)[:4]).zfill(4) + "-" + (str(1)[:4]).zfill(4),
+            studentNum=(str(john.pk)[:4]).zfill(4),
             invoiceEmail=john.email,
         )
+
+        # Creation of lesson invoice for John Doe
+        now = datetime.datetime.now()
+
+        # Creation of Schedule for John Doe
+        Schedule.objects.create(
+            # time_stamp=models.DateTimeField(auto_now=True),
+            teacher=teacher1,
+            lesson=johnDoeLesson,
+            start_time=time(8, 30, 00),
+            start_date=term1.start_date,
+            interval=johnDoeLesson.desiredInterval,
+            number_of_lessons=johnDoeLesson.lessons,
+            duration=johnDoeLesson.duration,
+        )
+        # Updating Payment View for John Doe
+
+        johnPayment = Payment.objects.create(
+            payment_time=now,
+            student=john,
+            amount_paid=10,
+            balance_before=-60,
+            balance_after=-50,
+        )
+
+        john.outstanding_balance = johnPayment.balance_after
+        john.save()
 
         # Creation of lesson for deafult user Lisa Doe and Liam Doe
 
@@ -260,6 +308,12 @@ class Command(BaseCommand):
                 return term2
             elif termNumber == 3:
                 return term3
+            elif termNumber == 4:
+                return term4
+            elif termNumber == 5:
+                return term5
+            elif termNumber == 6:
+                return term6
 
         # Matching function to determine the availability of the seeded users.
 
