@@ -71,6 +71,23 @@
                     {{form.furtherInfo}}
                 </p>
                 <input type="submit" value="Submit" class='btn btn-primary'>
+                <ul class="errorlist">
+                    {% if form.non_field_errors %}
+                        <li>{{ form.non_field_errors }}</li>
+                    {% endif %}
+                    {% for field in form %}
+                        {% if field.errors %}
+                            <li>
+                            {{ field.label }}
+                            <ul class="errorlist">
+                                {% for error in field.errors %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                             </ul>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
             </form>
         </div>
     </div>

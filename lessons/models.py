@@ -91,8 +91,8 @@ class Lesson(models.Model):
     fridayAfternoon = models.BooleanField(default=False)
     fridayNight = models.BooleanField(default=False)
 
-    lessons = models.IntegerField(validators=[MaxValueValidator(4)],blank=False)
-    desiredInterval = models.CharField(max_length=100, blank=False)
+    lessons = models.IntegerField(blank=False)
+    desiredInterval = models.IntegerField(blank=False)
     duration = models.IntegerField(blank=False)
     furtherInfo = models.TextField()
     id = models.AutoField(primary_key=True, unique=True)

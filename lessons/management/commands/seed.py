@@ -34,9 +34,9 @@ DURATIONS = [
 ]
 
 LESSON_INTERVALS = [
-    1,
-    2,
-    3,
+    7,
+    14,
+    30,
 
 ]
 
@@ -204,7 +204,7 @@ class Command(BaseCommand):
             term=term1,
             mondayMorning=True,
             lessons=2,
-            desiredInterval='1',
+            desiredInterval=7,
             duration=30,
             furtherInfo="I want to learn piano",
             id=10,
@@ -221,7 +221,7 @@ class Command(BaseCommand):
             term=term1,
             tuesdayMorning=True,
             lessons=2,
-            desiredInterval='1',
+            desiredInterval=7,
             duration=45,
             furtherInfo="I want to learn piano",
             id=11,
@@ -237,7 +237,7 @@ class Command(BaseCommand):
             term=term1,
             mondayMorning=True,
             lessons=2,
-            desiredInterval='1',
+            desiredInterval=7,
             duration=30,
             furtherInfo="I want to learn piano",
             id=12,
@@ -250,19 +250,6 @@ class Command(BaseCommand):
         )
 
         # Creation of random users and data using faker.
-
-        # Function to determine the interval for lessons booked for seeded users.
-
-        def intervalGenerator(self, intervalNumber):
-            oncePerWeek = "Once a week"
-            twicePerWeek = "Twice a week"
-            oncePerMonth = "Once a month"
-            if intervalNumber == 1:
-                return oncePerWeek
-            elif intervalNumber == 2:
-                return twicePerWeek
-            elif intervalNumber == 3:
-                return oncePerMonth
 
         # Function to determine the term of the lesson booked for seeded users.
 
@@ -322,7 +309,7 @@ class Command(BaseCommand):
                 fridayNight=True,
 
                 lessons=self.faker.lesson_number(),
-                desiredInterval=intervalGenerator(self, self.faker.lesson_intervals()),
+                desiredInterval=self.faker.lesson_intervals(),
                 duration=self.faker.lesson_durations(),
                 furtherInfo="I want to learn " + self.faker.music_school_instruments(),
                 id=self.faker.unique.random_int(),

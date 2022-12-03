@@ -5,7 +5,7 @@ from lessons.models import User, Children, TermDates, Schedule, Renewal, Payment
 from django.utils.safestring import mark_safe
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
-import datetime
+from datetime import datetime, timedelta, date
 
 from .models import Lesson
 
@@ -60,6 +60,15 @@ class LessonForm(forms.ModelForm):
         self.fields['children'].queryset = Children.objects.filter(parent=self.request.user)
         self.fields['term'].queryset = TermDates.objects.all()
 
+    def clean(self):
+        super().clean()
+        currentTerm = self.cleaned_data.get('term')
+        number_of_lessons = self.cleaned_data.get('lessons')
+        interval = self.cleaned_data.get('desiredInterval')
+        term_length = (currentTerm.end_date - currentTerm.start_date).days
+        if (number_of_lessons-1) * interval > term_length:
+            self.add_error('lessons', 'Too much lessons, this term is not long enough!')
+
     class Meta:
         model=Lesson
         fields=('term', 'children',
@@ -73,9 +82,9 @@ class LessonForm(forms.ModelForm):
 
     INTERVAL_CHOICES= [
     ('',''),
-    ('Once a week', 'Once a week'),
-    ('Once every two weeks', 'Once every two weeks'),
-    ('Once a month', 'Once a month'),
+    ('7', 'Once a week'),
+    ('14', 'Once every two weeks'),
+    ('30', 'Once a month'),
     ]
 
     DURATION_CHOICES= [
@@ -118,7 +127,7 @@ class LessonForm(forms.ModelForm):
     fridayNight=forms.BooleanField(required=False,label=mark_safe("<strong> &nbsp Night (18:00 - 22:00)</strong>"))
 
     lessons= forms.IntegerField(label=mark_safe("<strong>Enter the number of lessons</strong>"))
-    desiredInterval=forms.CharField(label=mark_safe("<strong>Enter desired interval between lessons</strong>"),
+    desiredInterval=forms.IntegerField(label=mark_safe("<strong>Enter desired interval between lessons</strong>"),
     widget=forms.Select(choices=INTERVAL_CHOICES))
     duration=forms.IntegerField(label=mark_safe("<strong>Enter duration of the lesson</strong>"),
     widget=forms.Select(choices=DURATION_CHOICES))
@@ -172,11 +181,30 @@ class CustomScheduleForm(forms.ModelChoiceField):
     def label_from_instance(self, user):
         return user.first_name + ' ' + user.last_name
 
+def time_plus(time, timedelta):
+    start = datetime(
+        2000, 1, 1,
+        hour=time.hour, minute=time.minute, second=time.second)
+    end = start + timedelta
+    return end.time()
+        
 class ScheduleForm(forms.ModelForm):
+
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop('request')
         super(ScheduleForm, self).__init__(*args, **kwargs)
         self.fields['teacher'].queryset = User.objects.filter(is_teacher=True)
+
+    def clean(self):
+        super().clean()
+        currentTeacher = self.cleaned_data.get('teacher')
+        start_time = self.cleaned_data.get('start_time')
+        duration = self.cleaned_data.get('duration')
+        schedules = Schedule.objects.filter(teacher = currentTeacher)
+        for x in schedules:
+            if (start_time<=x.start_time and time_plus(start_time,timedelta(minutes=duration))>x.start_time) or (start_time>=x.start_time and start_time<time_plus(x.start_time,timedelta(minutes=x.duration))):
+                self.add_error('start_time', 'Teacher is not available during this time (overlap!)')
+                break
 
     class Meta:
         model = Schedule
