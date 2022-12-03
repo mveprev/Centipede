@@ -134,7 +134,7 @@ class Command(BaseCommand):
 
         term3 = TermDates.objects.create(
             name="Term 3",
-            start_date=datetime.date(2023, 5, 13),
+            start_date=datetime.date(2023, 6, 1),
             end_date=datetime.date(2023, 7, 30),
         )
 
