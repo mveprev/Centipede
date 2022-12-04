@@ -78,6 +78,76 @@ TIME_NUMBER = [
     12
 ]
 
+PAYMENTS = [
+    10,
+    20,
+    30,
+    40,
+    50,
+    60,
+    70,
+    80,
+    90,
+    100,
+    125,
+    150,
+    175,
+    200,
+]
+
+TEACHERS = [
+    1,
+    2,
+    3,
+    4,
+    5,
+]
+
+HOUR = [
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+]
+
+MINUTES = [
+    00,
+    15,
+    30,
+    45,
+]
+
+DATES = [
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+]
+
 
 class Provider(faker.providers.BaseProvider):
     def music_school_instruments(self):
@@ -97,6 +167,21 @@ class Provider(faker.providers.BaseProvider):
 
     def time_number(self):
         return self.random_element(TIME_NUMBER)
+
+    def lesson_payments(self):
+        return self.random_element(PAYMENTS)
+
+    def lesson_teachers(self):
+        return self.random_element(TEACHERS)
+
+    def lesson_hours(self):
+        return self.random_element(HOUR)
+
+    def lesson_minutes(self):
+        return self.random_element(MINUTES)
+
+    def lesson_dates(self):
+        return self.random_element(DATES)
 
 
 class Command(BaseCommand):
@@ -163,6 +248,38 @@ class Command(BaseCommand):
             password=password_data,
             first_name="Paul",
             last_name="Smith",
+            is_teacher=True,
+        )
+
+        teacher2 = User.objects.create(
+            email="laura.slater@example.org",
+            password=password_data,
+            first_name="Laura",
+            last_name="Slater",
+            is_teacher=True,
+        )
+
+        teacher3 = User.objects.create(
+            email="aisha.toumi@example.org",
+            password=password_data,
+            first_name="Aisha",
+            last_name="Toumi",
+            is_teacher=True,
+        )
+
+        teacher4 = User.objects.create(
+            email="lee.roberts@example.org",
+            password=password_data,
+            first_name="Lee",
+            last_name="Robber",
+            is_teacher=True,
+        )
+
+        teacher5 = User.objects.create(
+            email="dwayne.johnson@example.org",
+            password=password_data,
+            first_name="Dwayne",
+            last_name="Johnson",
             is_teacher=True,
         )
 
@@ -326,7 +443,24 @@ class Command(BaseCommand):
             else:
                 return False
 
-        for _ in range(0, 97):
+        # Matching function to determine the teacher of the seeded users.
+        def teacherGenerator(self, teacherNumber):
+            if teacherNumber == 1:
+                return teacher1
+            elif teacherNumber == 2:
+                return teacher2
+            elif teacherNumber == 3:
+                return teacher3
+            elif teacherNumber == 4:
+                return teacher4
+            elif teacherNumber == 5:
+                return teacher5
+
+        # Function to ensure lesson booking times don't clash for seeded users.
+
+        # Creation of seeded users without confirmed lessons and payments.
+
+        for _ in range(0, 43):
 
             # password_data_general = self.faker.password(
             #     length=11, special_chars=True, upper_case=True)
@@ -375,3 +509,82 @@ class Command(BaseCommand):
                 studentNum=(str(newUser.pk)[:4]).zfill(4),
                 invoiceEmail=newUser.email,
             )
+
+            # Creation of seeded users with confirmed lessons and payments.
+
+        for _ in range(0, 50):
+
+            # password_data_general = self.faker.password(
+            #     length=11, special_chars=True, upper_case=True)
+
+            first_name = self.faker.first_name()
+            last_name = self.faker.last_name()
+            email = first_name.lower() + "-" + last_name.lower() + \
+                "@" + self.faker.free_email_domain()
+
+            newUser = User.objects.create(
+                email=email,
+                password=password_data,
+                first_name=first_name,
+                last_name=last_name,
+            )
+
+            userLesson = Lesson.objects.create(
+                term=termGenerator(self, self.faker.lesson_terms()),
+
+                mondayMorning=timeGenerator(self, self.faker.time_number()),
+                mondayAfternoon=timeGenerator(self, self.faker.time_number()),
+                mondayNight=timeGenerator(self, self.faker.time_number()),
+                tuesdayMorning=timeGenerator(self, self.faker.time_number()),
+                tuesdayAfternoon=timeGenerator(self, self.faker.time_number()),
+                tuesdayNight=timeGenerator(self, self.faker.time_number()),
+                wednesdayMorning=timeGenerator(self, self.faker.time_number()),
+                wednesdayAfternoon=timeGenerator(self, self.faker.time_number()),
+                wednesdayNight=timeGenerator(self, self.faker.time_number()),
+                thursdayMorning=timeGenerator(self, self.faker.time_number()),
+                thursdayAfternoon=timeGenerator(self, self.faker.time_number()),
+                thursdayNight=timeGenerator(self, self.faker.time_number()),
+                fridayMorning=timeGenerator(self, self.faker.time_number()),
+                fridayAfternoon=timeGenerator(self, self.faker.time_number()),
+                fridayNight=True,
+
+                lessons=self.faker.lesson_number(),
+                desiredInterval=self.faker.lesson_intervals(),
+                duration=self.faker.lesson_durations(),
+                furtherInfo="I want to learn " + self.faker.music_school_instruments(),
+                id=self.faker.unique.random_int(),
+                user=newUser,
+                # children=liamChildren,
+                is_confirmed=True,
+                invoiceNum=(str(newUser.pk)[:4]).zfill(4) + "-" + \
+                (str(self.faker.unique.random_int())[:4]).zfill(4),
+                studentNum=(str(newUser.pk)[:4]).zfill(4),
+                invoiceEmail=newUser.email,
+            )
+
+            now = datetime.datetime.now()
+            startDate = datetime.date(2022, 12, self.faker.lesson_dates())
+            # Creation of Schedule for seeded usrs
+            Schedule.objects.create(
+                # time_stamp=models.DateTimeField(auto_now=True),
+                teacher=teacherGenerator(self, self.faker.lesson_teachers()),
+                lesson=userLesson,
+                start_time=time(self.faker.lesson_hours(), 00, 00),
+                # start_date=termGenerator(self, self.faker.lesson_terms()).start_date,
+                start_date=startDate,
+                interval=userLesson.desiredInterval,
+                number_of_lessons=userLesson.lessons,
+                duration=userLesson.duration,
+            )
+            # Updating Payment View for seeded usrs
+            payment = self.faker.lesson_payments()
+            newUserPayment = Payment.objects.create(
+                payment_time=now,
+                student=newUser,
+                amount_paid=payment,
+                balance_before=-(userLesson.duration*userLesson.lessons),
+                balance_after=-(userLesson.duration*userLesson.lessons) + payment,
+            )
+
+            newUser.outstanding_balance = newUserPayment.balance_after
+            newUser.save()

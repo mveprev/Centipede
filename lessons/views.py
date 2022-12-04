@@ -383,7 +383,12 @@ def invoice_generator(request, lessonId):
     currentLesson = Lesson.objects.get(id=lessonId)
     schedules = Schedule.objects.filter(lesson=currentLesson)
     currentSchedule = schedules.first()
-    lessonCost = 30
+    if currentLesson.duration == 30:
+        lessonCost = 30
+    elif currentLesson.duration == 45:
+        lessonCost = 45
+    elif currentLesson.duration == 60:
+        lessonCost = 60
     totalCost = lessonCost*currentSchedule.number_of_lessons
     if currentLesson.invoiceNum == 'default':
         currentLesson.invoiceNum = (str(currentUser.pk)[:4]).zfill(
