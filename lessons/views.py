@@ -2,15 +2,9 @@ from django.core.validators import validate_email
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import redirect, render
-
-from .forms import SignUpForm, LogInForm, LessonForm, ScheduleForm, ChildrenForm, RenewalForm
-from .forms import DateForm
-from .models import User, Lesson, Children, TermDates, Schedule 
-
 from .forms import SignUpForm, LogInForm, LessonForm, ScheduleForm, ChildrenForm, PaymentForm
 from .forms import DateForm
 from .models import User, Lesson, Children, TermDates, Schedule, Payment
-
 from django.db.models import Prefetch
 
 from datetime import datetime, timedelta, date
@@ -255,22 +249,7 @@ def delete_booking(request, lessonId):
 
 def renew_lesson(request, lessonId):
     lesson = Lesson.objects.get(id=lessonId)
-    terms = TermDates.objects.all()
-    
-    newKey = lesson.term.pk + 1
-    if  terms.filter(id = newKey).exists()==False:
-        messages.add_message(request, messages.ERROR, "There is no further term")
-    else:
-        lesson.id = None
-        lesson.term = terms.get(id = newKey)
-        lesson.user = request.user
-        lesson.save()
-    
-    
-    lessonsList = Lesson.objects.all()
-    return render(request, 'student_lessons.html', {'student_lessons': lessonsList})
-  
-    
+    return render(request, 'student_renewal_settings.html', {'lesson': lesson})
 
 
 def add_children(request):
@@ -473,4 +452,3 @@ def make_payment(request, userId):
     return render(request, 'make_payment.html',
                   {'student': student,
                    'form': form})
-
