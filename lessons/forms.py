@@ -193,23 +193,24 @@ def time_plus(time, timedelta):
         
 class ScheduleForm(forms.ModelForm):
 
-    def __init__(self, *args, **kwargs):
-        self.request = kwargs.pop('request')
-        super(ScheduleForm, self).__init__(*args, **kwargs)
-        self.fields['teacher'].queryset = User.objects.filter(is_teacher=True)
-
     def clean(self):
         super().clean()
         currentTeacher = self.cleaned_data.get('teacher')
         start_time = self.cleaned_data.get('start_time')
         start_date = self.cleaned_data.get("start_date")
         duration = self.cleaned_data.get('duration')
+        interval = self.cleaned_data.get('interval')
+        number_of_lessons = self.cleaned_data.get('number_of_lessons')
         schedules = Schedule.objects.filter(teacher = currentTeacher)
+        list_of_date = []
+        for x in range(0,number_of_lessons):
+            list_of_date.append(start_date+(timedelta(days=interval)*x))
         for x in schedules:
-            if start_date == x.start_date:
-                if (start_time<=x.start_time and time_plus(start_time,timedelta(minutes=duration))>x.start_time) or (start_time>=x.start_time and start_time<time_plus(x.start_time,timedelta(minutes=x.duration))):
-                    self.add_error('start_time', 'Teacher is not available during this time (overlap!)')
-                    break
+            for date in list_of_date:
+                if date == x.start_date:
+                    if (start_time<=x.start_time and time_plus(start_time,timedelta(minutes=duration))>x.start_time) or (start_time>=x.start_time and start_time<time_plus(x.start_time,timedelta(minutes=x.duration))):
+                        self.add_error('start_time', 'Teacher is not available for at least one of these lessons')
+                        break
 
     class Meta:
         model = Schedule
@@ -230,7 +231,7 @@ class ScheduleForm(forms.ModelForm):
     ]
 
     teacher = CustomScheduleForm(
-        queryset=None,
+        queryset=User.objects.filter(is_teacher=True),
         empty_label='------------ Please select teacher ------------',
         required=True,
         widget=forms.Select,

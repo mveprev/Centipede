@@ -2,9 +2,10 @@ from django.core.management.base import BaseCommand, CommandError
 from faker import Faker
 import faker.providers
 from lessons.models import UserManager, User, Lesson, TermDates, Children, Schedule, Payment
+from lessons.forms import ScheduleForm
 import random
 import datetime
-from datetime import date, time
+from datetime import date, time, timedelta
 from django.contrib.auth.hashers import make_password
 
 
@@ -564,18 +565,45 @@ class Command(BaseCommand):
 
             now = datetime.datetime.now()
             startDate = datetime.date(2022, 12, self.faker.lesson_dates())
+
             # Creation of Schedule for seeded usrs
-            Schedule.objects.create(
-                # time_stamp=models.DateTimeField(auto_now=True),
-                teacher=teacherGenerator(self, self.faker.lesson_teachers()),
-                lesson=userLesson,
-                start_time=time(self.faker.lesson_hours(), 00, 00),
-                # start_date=termGenerator(self, self.faker.lesson_terms()).start_date,
-                start_date=startDate,
-                interval=userLesson.desiredInterval,
-                number_of_lessons=userLesson.lessons,
-                duration=userLesson.duration,
-            )
+            form_input = {
+                'teacher':teacherGenerator(self, self.faker.lesson_teachers()),
+                'start_time':time(self.faker.lesson_hours(), 00, 00),
+                'start_date':startDate,
+                'interval':userLesson.desiredInterval,
+                'number_of_lessons':userLesson.lessons,
+                'duration':userLesson.duration,
+            }
+            form = ScheduleForm(data=form_input)
+            while not form.is_valid():
+                form_input = {
+                    'teacher':teacherGenerator(self, self.faker.lesson_teachers()),
+                    'start_time':time(self.faker.lesson_hours(), 00, 00),
+                    'start_date':startDate,
+                    'interval':userLesson.desiredInterval,
+                    'number_of_lessons':userLesson.lessons,
+                    'duration':userLesson.duration,
+                }
+                form = ScheduleForm(data=form_input)
+
+            newSchedule = form.save(commit=False)
+            newSchedule.lesson = userLesson
+            newSchedule.save()
+
+            for i in range(1, newSchedule.number_of_lessons):
+                subSchedule = Schedule.objects.create(
+                    teacher=newSchedule.teacher,
+                    lesson=newSchedule.lesson,
+                    start_time=newSchedule.start_time,
+                    start_date=newSchedule.start_date + timedelta(days=i*newSchedule.interval),
+                    interval=newSchedule.interval,
+                    number_of_lessons=newSchedule.number_of_lessons,
+                    duration=newSchedule.duration,
+                )
+                subSchedule.save()
+            
+
             # Updating Payment View for seeded usrs
             payment = self.faker.lesson_payments()
             newUserPayment = Payment.objects.create(

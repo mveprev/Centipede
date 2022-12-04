@@ -147,7 +147,7 @@ def edit_lesson(request, lessonId):
 
 def book_lesson(request, lessonId):
     lesson = Lesson.objects.get(id=lessonId)
-    form = ScheduleForm(data=request.POST or None, request=request)
+    form = ScheduleForm(data=request.POST or None)
     if form.is_valid():
         schedule = form.save(commit=False)
         schedule.lesson = lesson
@@ -192,7 +192,7 @@ def edit_booking(request, lessonId):
     lessonCost = 20
     initialLessons = schedule.number_of_lessons
     initialCost = lessonCost*initialLessons
-    form = ScheduleForm(data=request.POST or None, instance=schedule, request=request)
+    form = ScheduleForm(data=request.POST or None, instance=schedule)
     if form.is_valid():
         schedule = form.save(commit=False)
         schedule.save()
