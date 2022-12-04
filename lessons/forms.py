@@ -47,10 +47,13 @@ class SignUpForm(forms.ModelForm):
         return user
 
 
-class CustomLessonForm(forms.ModelChoiceField):
+class CustomChildren(forms.ModelChoiceField):
     def label_from_instance(self, children):
         return children.first_name + ' ' + children.last_name
 
+class CustomTerm(forms.ModelChoiceField):
+    def label_from_instance(self, term):
+        return term.name
 
 class LessonForm(forms.ModelForm):
 
@@ -94,37 +97,37 @@ class LessonForm(forms.ModelForm):
     ('60', '60'),
     ]
 
-    term = forms.ModelChoiceField(
+    term = CustomTerm(
         queryset=None,
-        empty_label='------------ Please select term ------------',
+        empty_label='----------------------------------- Please select term -----------------------------------',
         required=True,
         widget=forms.Select,
         label=mark_safe("<strong>Select Term</strong>")
     )
 
-    children = CustomLessonForm(
+    children = CustomChildren(
         queryset=None,
-        empty_label='------------ I am booking lessons for myself ------------',
+        empty_label='------------------------------ I am booking lessons for myself ------------------------------',
         required=False,
         widget=forms.Select,
         label=mark_safe("<strong>Select Children</strong>")
     )
 
-    mondayMorning=forms.BooleanField(required=False,label=mark_safe("<strong>Monday &nbsp&nbsp&nbsp&nbsp&nbsp Morning (8:00 - 12:00)</strong>"))
-    mondayAfternoon=forms.BooleanField(required=False,label=mark_safe("<strong> &nbsp Afternoon (13:00 - 17:00)</strong>"))
-    mondayNight=forms.BooleanField(required=False,label=mark_safe("<strong> &nbsp Night (18:00 - 22:00)</strong>"))
-    tuesdayMorning=forms.BooleanField(required=False,label=mark_safe("<strong>Tuesday &nbsp&nbsp&nbsp&nbsp&nbsp Morning (8:00 - 12:00)</strong>"))
-    tuesdayAfternoon=forms.BooleanField(required=False,label=mark_safe("<strong> &nbsp Afternoon (13:00 - 17:00)</strong>"))
-    tuesdayNight=forms.BooleanField(required=False,label=mark_safe("<strong> &nbsp Night (18:00 - 22:00)</strong>"))
-    wednesdayMorning=forms.BooleanField(required=False,label=mark_safe("<strong>Wednesday Morning (8:00 - 12:00)</strong>"))
-    wednesdayAfternoon=forms.BooleanField(required=False,label=mark_safe("<strong> &nbsp Afternoon (13:00 - 17:00)</strong>"))
-    wednesdayNight=forms.BooleanField(required=False,label=mark_safe("<strong> &nbsp Night (18:00 - 22:00)</strong>"))
-    thursdayMorning=forms.BooleanField(required=False,label=mark_safe("<strong>Thursday &nbsp&nbsp&nbsp&nbsp Morning (8:00 - 12:00)</strong>"))
-    thursdayAfternoon=forms.BooleanField(required=False,label=mark_safe("<strong> &nbsp Afternoon (13:00 - 17:00)</strong>"))
-    thursdayNight=forms.BooleanField(required=False,label=mark_safe("<strong> &nbsp Night (18:00 - 22:00)</strong>"))
-    fridayMorning=forms.BooleanField(required=False,label=mark_safe("<strong>Friday &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Morning (8:00 - 12:00)</strong>"))
-    fridayAfternoon=forms.BooleanField(required=False,label=mark_safe("<strong> &nbsp Afternoon (13:00 - 17:00)</strong>"))
-    fridayNight=forms.BooleanField(required=False,label=mark_safe("<strong> &nbsp Night (18:00 - 22:00)</strong>"))
+    mondayMorning=forms.BooleanField(required=False,label=mark_safe("<strong>Morning (8:00 - 12:00)</strong>"))
+    mondayAfternoon=forms.BooleanField(required=False,label=mark_safe("<strong> &nbsp &nbsp &nbsp Afternoon (13:00 - 17:00)</strong>"))
+    mondayNight=forms.BooleanField(required=False,label=mark_safe("<strong> &nbsp &nbsp &nbsp Night (18:00 - 22:00)</strong>"))
+    tuesdayMorning=forms.BooleanField(required=False,label=mark_safe("<strong>Morning (8:00 - 12:00)</strong>"))
+    tuesdayAfternoon=forms.BooleanField(required=False,label=mark_safe("<strong> &nbsp &nbsp &nbsp Afternoon (13:00 - 17:00)</strong>"))
+    tuesdayNight=forms.BooleanField(required=False,label=mark_safe("<strong> &nbsp &nbsp &nbsp Night (18:00 - 22:00)</strong>"))
+    wednesdayMorning=forms.BooleanField(required=False,label=mark_safe("<strong>Morning (8:00 - 12:00)</strong>"))
+    wednesdayAfternoon=forms.BooleanField(required=False,label=mark_safe("<strong> &nbsp &nbsp &nbsp Afternoon (13:00 - 17:00)</strong>"))
+    wednesdayNight=forms.BooleanField(required=False,label=mark_safe("<strong> &nbsp &nbsp &nbsp Night (18:00 - 22:00)</strong>"))
+    thursdayMorning=forms.BooleanField(required=False,label=mark_safe("<strong>Morning (8:00 - 12:00)</strong>"))
+    thursdayAfternoon=forms.BooleanField(required=False,label=mark_safe("<strong> &nbsp &nbsp &nbsp Afternoon (13:00 - 17:00)</strong>"))
+    thursdayNight=forms.BooleanField(required=False,label=mark_safe("<strong> &nbsp &nbsp &nbsp Night (18:00 - 22:00)</strong>"))
+    fridayMorning=forms.BooleanField(required=False,label=mark_safe("<strong>Morning (8:00 - 12:00)</strong>"))
+    fridayAfternoon=forms.BooleanField(required=False,label=mark_safe("<strong> &nbsp &nbsp &nbsp Afternoon (13:00 - 17:00)</strong>"))
+    fridayNight=forms.BooleanField(required=False,label=mark_safe("<strong> &nbsp &nbsp &nbsp Night (18:00 - 22:00)</strong>"))
 
     lessons= forms.IntegerField(label=mark_safe("<strong>Enter the number of lessons</strong>"))
     desiredInterval=forms.IntegerField(label=mark_safe("<strong>Enter desired interval between lessons</strong>"),
@@ -199,12 +202,14 @@ class ScheduleForm(forms.ModelForm):
         super().clean()
         currentTeacher = self.cleaned_data.get('teacher')
         start_time = self.cleaned_data.get('start_time')
+        start_date = self.cleaned_data.get("start_date")
         duration = self.cleaned_data.get('duration')
         schedules = Schedule.objects.filter(teacher = currentTeacher)
         for x in schedules:
-            if (start_time<=x.start_time and time_plus(start_time,timedelta(minutes=duration))>x.start_time) or (start_time>=x.start_time and start_time<time_plus(x.start_time,timedelta(minutes=x.duration))):
-                self.add_error('start_time', 'Teacher is not available during this time (overlap!)')
-                break
+            if start_date == x.start_date:
+                if (start_time<=x.start_time and time_plus(start_time,timedelta(minutes=duration))>x.start_time) or (start_time>=x.start_time and start_time<time_plus(x.start_time,timedelta(minutes=x.duration))):
+                    self.add_error('start_time', 'Teacher is not available during this time (overlap!)')
+                    break
 
     class Meta:
         model = Schedule
