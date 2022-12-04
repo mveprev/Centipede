@@ -2,16 +2,23 @@ from django.core.validators import validate_email
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import redirect, render
+
 from .forms import SignUpForm, LogInForm, LessonForm, ScheduleForm, ChildrenForm, RenewalForm
 from .forms import DateForm
 from .models import User, Lesson, Children, TermDates, Schedule 
+
+from .forms import SignUpForm, LogInForm, LessonForm, ScheduleForm, ChildrenForm, PaymentForm
+from .forms import DateForm
+from .models import User, Lesson, Children, TermDates, Schedule, Payment
+
 from django.db.models import Prefetch
 
-from datetime import datetime
+from datetime import datetime, timedelta, date
 from django.http import HttpResponse
 from django.views import generic
 from django.utils.safestring import mark_safe
 from .utils import Calendar
+import calendar
 # Create your views here.
 
 
@@ -21,17 +28,29 @@ class CalendarView(generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        # use today's date for the calendar
-        d = get_date(self.request.GET.get('day', None))
-
-        # Instantiate our calendar class with today's year and date
+        d = get_date(self.request.GET.get('month', None))
         cal = Calendar(self.request.user, d.year, d.month)
-
-        # Call the formatmonth method, which returns our calendar as a table
         html_cal = cal.formatmonth(withyear=True)
         context['calendar'] = mark_safe(html_cal)
+        context['prev_month'] = prev_month(d)
+        context['next_month'] = next_month(d)
         return context
+
+
+def prev_month(d):
+    first = d.replace(day=1)
+    prev_month = first - timedelta(days=1)
+    month = 'month=' + str(prev_month.year) + '-' + str(prev_month.month)
+    return month
+
+
+def next_month(d):
+    days_in_month = calendar.monthrange(d.year, d.month)[1]
+    last = d.replace(day=days_in_month)
+    next_month = last + timedelta(days=1)
+    month = 'month=' + str(next_month.year) + '-' + str(next_month.month)
+    return month
+
 
 def get_date(req_day):
     if req_day:
@@ -39,8 +58,10 @@ def get_date(req_day):
         return date(year, month, day=1)
     return datetime.today()
 
+
 def home(request):
     return render(request, 'home.html')
+
 
 def student_landing_page(request):
     if request.method == "POST":
@@ -132,13 +153,37 @@ def edit_lesson(request, lessonId):
 
 def book_lesson(request, lessonId):
     lesson = Lesson.objects.get(id=lessonId)
-    form = ScheduleForm(data=request.POST or None, request=request)
+    form = ScheduleForm(data=request.POST or None)
     if form.is_valid():
         schedule = form.save(commit=False)
         schedule.lesson = lesson
         schedule.save()
+        for i in range(1, schedule.number_of_lessons):
+            newSchedule = Schedule.objects.create(
+                teacher=schedule.teacher,
+                lesson=schedule.lesson,
+                start_time=schedule.start_time,
+                start_date=schedule.start_date + timedelta(days=i*schedule.interval),
+                interval=schedule.interval,
+                number_of_lessons=schedule.number_of_lessons,
+                duration=schedule.duration,
+            )
+            newSchedule.save()
         lesson.is_confirmed = True
+        lesson.lessons = schedule.number_of_lessons
+        lesson.duration = schedule.duration
+        if schedule.interval == '7':
+            lesson.desiredInterval = 'Once a week'
+        elif schedule.interval == '14':
+            lesson.desiredInterval = 'Once every two weeks'
+        elif schedule.interval == '30':
+            lesson.desiredInterval = 'Once a month'
         lesson.save()
+        user = lesson.user
+        lessonCost = 20
+        totalCost = lessonCost*schedule.number_of_lessons
+        user.outstanding_balance -= totalCost
+        user.save()
         lessonsList = Lesson.objects.all()
         return render(request, 'admin_lessons.html', {'admin_lessons': lessonsList})
     return render(request, 'book_lessons.html',
@@ -148,11 +193,44 @@ def book_lesson(request, lessonId):
 
 def edit_booking(request, lessonId):
     lesson = Lesson.objects.get(id=lessonId)
-    schedule = Schedule.objects.get(lesson = lesson)
-    form = ScheduleForm(data=request.POST or None, instance=schedule, request=request)
+    schedules = Schedule.objects.filter(lesson=lesson)
+    schedule = schedules.first()
+    lessonCost = 20
+    initialLessons = schedule.number_of_lessons
+    initialCost = lessonCost*initialLessons
+    form = ScheduleForm(data=request.POST or None, instance=schedule)
     if form.is_valid():
         schedule = form.save(commit=False)
         schedule.save()
+        lesson.lessons = schedule.number_of_lessons
+        lesson.duration = schedule.duration
+        if schedule.interval == '7':
+            lesson.desiredInterval = 'Once a week'
+        elif schedule.interval == '14':
+            lesson.desiredInterval = 'Once every two weeks'
+        elif schedule.interval == '30':
+            lesson.desiredInterval = 'Once a month'
+        lesson.save()
+        newLessons = schedule.number_of_lessons
+        user = lesson.user
+        if newLessons < initialLessons:
+            differenceCost = initialCost - (lessonCost*newLessons)
+            user.outstanding_balance += differenceCost
+        elif newLessons > initialLessons:
+            differenceCost = (lessonCost*newLessons) - initialCost
+            user.outstanding_balance -= differenceCost
+        user.save()
+        i = 0
+        for x in schedules:
+            x.teacher = schedule.teacher
+            x.lesson = schedule.lesson
+            x.start_time = schedule.start_time
+            x.start_date = schedule.start_date + timedelta(days=i*schedule.interval)
+            x.interval = schedule.interval
+            x.number_of_lessons = schedule.number_of_lessons
+            x.duration = schedule.duration
+            x.save()
+            i += 1
         lessonsList = Lesson.objects.all()
         return render(request, 'admin_lessons.html', {'admin_lessons': lessonsList})
     return render(request, 'update_bookings.html',
@@ -162,11 +240,18 @@ def edit_booking(request, lessonId):
 
 def delete_booking(request, lessonId):
     lesson = Lesson.objects.get(id=lessonId)
-    schedule = Schedule.objects.get(lesson=lesson)
+    schedules = Schedule.objects.filter(lesson=lesson)
+    schedule = schedules.first()
+    lessonCost = 20
+    totalCost = lessonCost*schedule.number_of_lessons
+    user = lesson.user
+    user.outstanding_balance += totalCost
+    user.save()
     lesson.delete()
-    schedule.delete()
+    schedules.delete()
     lessonsList = Lesson.objects.all()
     return render(request, 'admin_lessons.html', {'admin_lessons': lessonsList})
+
 
 def renew_lesson(request, lessonId):
     lesson = Lesson.objects.get(id=lessonId)
@@ -186,6 +271,7 @@ def renew_lesson(request, lessonId):
     return render(request, 'student_lessons.html', {'student_lessons': lessonsList})
   
     
+
 
 def add_children(request):
     if request.method == "POST":
@@ -221,7 +307,12 @@ def delete_children(request, childrenId):
 
 
 def student_payment(request):
-    return render(request, 'student_payment.html')
+    if request.user.is_authenticated:
+        currentUser = request.user
+        paymentList = Payment.objects.filter(student=currentUser).order_by('-payment_time')
+        return render(request, 'student_payment.html', {'student': currentUser, 'student_payment': paymentList})
+    else:
+        return render(request, 'home.html')
 
 
 def admin_landing_page(request):
@@ -229,7 +320,8 @@ def admin_landing_page(request):
 
 
 def admin_payment(request):
-    return render(request, 'admin_payment.html')
+    studentList = User.objects.filter(is_teacher=False, is_staff=False, is_superuser=False)
+    return render(request, 'admin_payment.html', {'admin_payment': studentList})
 
 
 def sign_up(request):
@@ -273,28 +365,32 @@ def term_dates(request):
             form.save()
             terms = TermDates.objects.all()
             return redirect('view_term_dates')
-    return render(request, 'term_dates.html', {'form':form})
+    return render(request, 'term_dates.html', {'form': form})
+
 
 def view_term_dates(request):
     terms = TermDates.objects.all()
-    return render(request, 'view_term_dates.html', {"term_dates":terms})
+    return render(request, 'view_term_dates.html', {"term_dates": terms})
+
 
 def edit_term_dates(request, term_id):
     term = TermDates.objects.get(pk=term_id)
-    form = DateForm(data=request.POST or None, instance = term)
+    form = DateForm(data=request.POST or None, instance=term)
     if form.is_valid():
         term = form.save(commit=False)
         term.save()
         terms = TermDates.objects.all()
-        return render(request, 'view_term_dates.html', {"term_dates":terms})
+        return render(request, 'view_term_dates.html', {"term_dates": terms})
     terms = TermDates.objects.all()
-    return render(request, 'edit_term.html', {"term_dates":terms, 'form':form})
+    return render(request, 'edit_term.html', {"term_dates": terms, 'form': form})
+
 
 def delete_term_dates(request, term_id):
     term = TermDates.objects.get(pk=term_id)
     term.delete()
     terms = TermDates.objects.all()
-    return render(request, 'view_term_dates.html', {"term_dates":terms})
+    return render(request, 'view_term_dates.html', {"term_dates": terms})
+
 
 def log_out(request):
     logout(request)
@@ -306,21 +402,28 @@ def log_out(request):
 def invoice_generator(request, lessonId):
     currentUser = request.user
     currentLesson = Lesson.objects.get(id=lessonId)
-    currentSchedule = Schedule.objects.get(lesson=currentLesson)
-    lessonCost = 20
-    totalCost = lessonCost*currentLesson.lessons
+    schedules = Schedule.objects.filter(lesson=currentLesson)
+    currentSchedule = schedules.first()
+    if currentLesson.duration == 30:
+        lessonCost = 30
+    elif currentLesson.duration == 45:
+        lessonCost = 45
+    elif currentLesson.duration == 60:
+        lessonCost = 60
+    totalCost = lessonCost*currentSchedule.number_of_lessons
     if currentLesson.invoiceNum == 'default':
-        currentLesson.invoiceNum = (str(currentUser.pk)[:4]).zfill(4) + "-" + (str(currentLesson.pk)[:4]).zfill(4)
+        currentLesson.invoiceNum = (str(currentUser.pk)[:4]).zfill(
+            4) + "-" + (str(currentLesson.pk)[:4]).zfill(4)
         currentLesson.save()
     if currentLesson.studentNum == 'default':
         currentLesson.studentNum = (str(currentUser.pk)[:4]).zfill(4)
         currentLesson.save()
     if(currentLesson.children is not None):
-        first_name = currentLesson.children.first_name;
-        last_name = currentLesson.children.last_name;
+        first_name = currentLesson.children.first_name
+        last_name = currentLesson.children.last_name
     else:
-        first_name = currentUser.first_name;
-        last_name = currentUser.last_name;
+        first_name = currentUser.first_name
+        last_name = currentUser.last_name
 
     information = {
         "first_name": first_name,
@@ -328,7 +431,7 @@ def invoice_generator(request, lessonId):
         "email_address": currentLesson.invoiceEmail,
         "Student_Id": currentLesson.studentNum,
         "Invoice_Id": currentLesson.invoiceNum,
-        "Lesson_type": "Type of Instrument",
+        "Lesson_type": "Music Lesson",
         "Number_of_lessons": currentSchedule.number_of_lessons,
         "Cost_per_lesson": lessonCost,
         "Total_cost": totalCost,
@@ -336,16 +439,38 @@ def invoice_generator(request, lessonId):
     }
     return render(request, 'invoices.html', information)
 
+
 def lesson_detail_generator(request, lessonId):
     currentLesson = Lesson.objects.get(id=lessonId)
-    currentSchedule = Schedule.objects.get(lesson=currentLesson)
+    schedules = Schedule.objects.filter(lesson=currentLesson)
+    currentSchedule = schedules.first()
     information = {
         "Number_of_lessons": currentSchedule.number_of_lessons,
         "Start_date": currentSchedule.start_date,
         "Start_time": currentSchedule.start_time,
         "Interval": currentSchedule.interval,
-        "Duration":currentSchedule.duration,
-        "Teacher":currentSchedule.teacher
+        "Duration": currentSchedule.duration,
+        "Teacher": currentSchedule.teacher
     }
     return render(request, 'student_timetable.html', information)
+
+
+def make_payment(request, userId):
+    student = User.objects.get(id=userId)
+    form = PaymentForm(data=request.POST or None)
+    if form.is_valid():
+        payment = form.save(commit=False)
+        payment.student = student
+        payment.save()
+        amount_paid = payment.amount_paid
+        payment.balance_before = student.outstanding_balance
+        student.outstanding_balance += amount_paid
+        student.save()
+        payment.balance_after = student.outstanding_balance
+        payment.save()
+        studentList = User.objects.filter(is_teacher=False, is_staff=False, is_superuser=False)
+        return render(request, 'admin_payment.html', {'admin_payment': studentList})
+    return render(request, 'make_payment.html',
+                  {'student': student,
+                   'form': form})
 

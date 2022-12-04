@@ -3,7 +3,10 @@
 <div class='container'>
     <div class='row'>
         <div class='col-sm-12 col-md-6 offset-md-3'>
-            <h1>Page to edit bookings</h1>
+            <strong>Student:</strong>
+            <p>{{student.first_name}} {{' '}} {{student.last_name}}</p>
+            <strong>Balance:</strong>
+            <p>{{student.outstanding_balance}}</p>
             <p><b>
               <form action="" method=POST>
               {% csrf_token %}

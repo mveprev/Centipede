@@ -6,9 +6,14 @@
             <h1>Term Dates</h1>
             <form action="" method=POST>
               {% csrf_token%}
+
               {{form.as_p}}
               <input type="submit" value = "Submit"
               class="btn btn-success">
+
+              {% include 'partials/bootstrap_form.html' with form=form %}
+              <input type="submit" value = "Submit" class="btn btn-success">
+
               </form>
         </div>
     </div>

@@ -45,4 +45,5 @@ urlpatterns = [
     path('invoices/<lessonId>', views.invoice_generator, name='invoices'),
     path('student_timetable/<lessonId>', views.lesson_detail_generator, name='student_timetable'),
     path('renew_lesson/<lessonId>', views.renew_lesson, name='renew_lesson'),
+    path('make_payment/<userId>', views.make_payment, name='make_payment')
 ]
