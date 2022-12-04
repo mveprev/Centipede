@@ -1,7 +1,8 @@
+"""Forms for the Lessons app."""
 from django.core.validators import validate_email
 from django.core.validators import RegexValidator, MinValueValidator
 from django import forms
-from lessons.models import User, Children, TermDates, Schedule, Renewal, Payment
+from lessons.models import User, Children, TermDates, Schedule, Payment
 from django.utils.safestring import mark_safe
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
@@ -10,11 +11,16 @@ from datetime import datetime, timedelta, date
 from .models import Lesson
 
 class LogInForm(forms.Form):
+    """Form enabling registered users to log in."""
     email = forms.CharField(label='Email')
     password = forms.CharField(label='Password', widget=forms.PasswordInput())
 
 class SignUpForm(forms.ModelForm):
+    """Form enabling unregistered users to sign up."""
+
     class Meta:
+        """Form options."""
+
         model = User
         fields = ['first_name','last_name']
 
@@ -30,6 +36,9 @@ class SignUpForm(forms.ModelForm):
     password_confirmation = forms.CharField(label = 'Password confirmation', widget = forms.PasswordInput())
 
     def clean(self):
+
+        """Clean the data and generate messages for any errors."""
+
         super().clean()
         new_password = self.cleaned_data.get('new_password')
         password_confirmation = self.cleaned_data.get('password_confirmation')
@@ -37,6 +46,9 @@ class SignUpForm(forms.ModelForm):
             self.add_error('password_confirmation', 'Confirmation does not match password.')
 
     def save(self):
+
+        """Create a new user."""
+
         super().save(commit=False)
         user = User.objects.create_user(
             self.cleaned_data.get('email'),
@@ -56,6 +68,7 @@ class CustomTerm(forms.ModelChoiceField):
         return term.name
 
 class LessonForm(forms.ModelForm):
+    """Form to ask user for fill in a lesson."""
 
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop('request')
@@ -73,6 +86,8 @@ class LessonForm(forms.ModelForm):
             self.add_error('lessons', 'Too much lessons, this term is not long enough!')
 
     class Meta:
+        """Form options."""
+
         model=Lesson
         fields=('term', 'children',
             'mondayMorning','mondayAfternoon','mondayNight',
@@ -138,7 +153,11 @@ class LessonForm(forms.ModelForm):
     widget=forms.Textarea(attrs={'rows':5, 'cols':60}))
 
 class ChildrenForm(forms.ModelForm):
+    """Form to ask user for fill in details of the child"""
+
     class Meta:
+        """Form options."""
+
         model = Children
         fields = ('first_name','last_name','age', 'email')
 
@@ -154,7 +173,11 @@ class TimePickerInput(forms.TimeInput):
         input_type = 'time'
 
 class DateForm(forms.ModelForm):
+    """Form to ask user for fill in a lesson."""
+
     class Meta:
+        """Form options."""
+
         model = TermDates
         fields = ('name', 'start_date', 'end_date')
 
@@ -192,6 +215,7 @@ def time_plus(time, timedelta):
     return end.time()
         
 class ScheduleForm(forms.ModelForm):
+    """Form to ask user for fill in a schedule."""
 
     def clean(self):
         super().clean()
@@ -213,6 +237,8 @@ class ScheduleForm(forms.ModelForm):
                         break
 
     class Meta:
+        """Form options."""
+        
         model = Schedule
         fields = ('teacher','start_time','start_date','interval','number_of_lessons','duration')
 
@@ -243,15 +269,14 @@ class ScheduleForm(forms.ModelForm):
     interval = forms.IntegerField(label=mark_safe("<strong>Enter interval between lessons</strong>"),widget=forms.Select(choices=INTERVAL_CHOICES))
     duration = forms.IntegerField(label=mark_safe("<strong>Enter duration of the lesson</strong>"),widget=forms.Select(choices=DURATION_CHOICES))
 
-class RenewForm(forms.ModelForm):
-    class Meta:
-        model = Renewal
-        fields = ('renew',)
 
-    renew = forms.BooleanField(label=mark_safe("<strong>Renew</strong>"))
 
 class PaymentForm(forms.ModelForm):
+    """Form to ask user to enter the amount paid."""
+
     class Meta:
+        """Form options."""
+
         model = Payment
         fields = ('amount_paid',)
     amount_paid = forms.IntegerField(validators=[MinValueValidator(limit_value=1, message = "Amount paid must be a positive integer.")],
