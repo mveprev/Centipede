@@ -7,8 +7,10 @@
             <table class="table">
               <thead>
                 <tr>
+                  <th scope="col">Name</th>
                   <th scope="col">Start Date</th>
                   <th scope="col">End Date</th>
+                  <th scope="col">Weeks in the term</th>
                 </tr>
               </thead>
               <tbody>
@@ -19,6 +21,7 @@
                       <td>{{TermDates.name}}</td>
                       <td>{{TermDates.start_date}}</td>
                       <td>{{TermDates.end_date}}</td>
+                      <td>{{TermDates.weeks}}</td>
                       <th scope="col">
                         <a class="btn btn-primary btn-sm"
                         href="{% url 'edit_term_dates' TermDates.pk%}"
