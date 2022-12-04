@@ -1,10 +1,9 @@
 from django.db import models
 
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
-
 from django.contrib.auth.models import PermissionsMixin, User
-from msms import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
+from msms import settings
 # Create your models here.
 
 
@@ -72,8 +71,7 @@ class TermDates(models.Model):
     name = models.CharField(max_length = 50, default = 'default', unique=True)
     start_date = models.DateField()
     end_date = models.DateField()
-    weeks = models.IntegerField(blank=False)
-    
+
 class Lesson(models.Model):
     term = models.ForeignKey(TermDates, on_delete=models.CASCADE, null=True)
 
@@ -93,14 +91,8 @@ class Lesson(models.Model):
     fridayAfternoon = models.BooleanField(default=False)
     fridayNight = models.BooleanField(default=False)
 
-    
-    lessons = models.IntegerField(validators=[MaxValueValidator(4)],blank=False)
-    desiredInterval = models.CharField(max_length=100, blank=False)
-
-
     lessons = models.IntegerField(blank=False)
     desiredInterval = models.IntegerField(blank=False)
-
     duration = models.IntegerField(blank=False)
     furtherInfo = models.TextField()
     id = models.AutoField(primary_key=True, unique=True)
@@ -121,7 +113,6 @@ class Schedule(models.Model):
     number_of_lessons = models.IntegerField(blank=False)
     duration = models.IntegerField(blank=False)
 
-
 class Renewal(models.Model):
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
     renew = models.BooleanField(default=True)
@@ -133,4 +124,3 @@ class Payment(models.Model):
     amount_paid = models.IntegerField(blank=False)
     balance_before = models.IntegerField(default=0, blank=False)
     balance_after = models.IntegerField(default=0, blank=False)
-
