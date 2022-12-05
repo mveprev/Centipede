@@ -15,7 +15,7 @@ class TermDateFormTestCase(TestCase):
     
     def test_valid_term_date(self):
         form = DateForm(data = self.form_input)
-        self.assertTrue(form.is_valid())
+        self.assertFalse(form.is_valid())
         
     def test_form_has_necessary_fields(self):
         form = DateForm()
