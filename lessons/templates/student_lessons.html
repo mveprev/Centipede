@@ -1,82 +1,58 @@
 {% extends 'student_base_content.html' %}
 {% block student_content %}
 <div class='container'>
-    <div class='row'>
-        <div class='col-sm-12 col-md-6 offset-md-3'>
-            <h1>Lessons Page for student</h1>
-            <p><b>UNDER CONSTRUCTION</b>: In this page user can edit lessons.</p>
-
-            <!--Makes the table that will display lessons.-->
-            <table class="table">
-              <thead>
-                <tr>
-                  <th scope="col">Student</th>
-                  <th scope="col">Lessons</th>
-                  <th scope="col">Desired Interval</th>
-                  <th scope="col">Duration</th>
-                  <th scope="col">Further Info</th>
-                  <th scope="col">Approved</th>
-                </tr>
-              </thead>
-              <tbody>
-                <div class="Lesson">
-                  <!--For loop goes through every student
-                  And adds it to the table.-->
-                  {% for Lesson in student_lessons %}
-                    <tr>
-                      {% if Lesson.children %}
-                        <td>{{Lesson.children.first_name}} {{' '}} {{Lesson.children.last_name}}</td>
-                      {% else %}
-                        <td>{{Lesson.user.first_name}} {{' '}} {{Lesson.user.last_name}}</td>
-                      {% endif %}
-                      <td>{{Lesson.lessons}}</td>
-                      <td>{{Lesson.desiredInterval}}</td>
-                      <td>{{Lesson.duration}}</td>
-                      <td>{{Lesson.furtherInfo}}</td>
-                      <!--Checks if the lesson is confirmed.
-                      Disables the button if it is.-->
-                      {% if Lesson.is_confirmed %}
-                        <td>Yes</td>
-                        <th scope="col"><button type="button" class="btn btn-primary btn-sm" disabled>Edit</button></th>
-                        <th scope="col">
-                          <button type="button" class="btn btn-secondary btn-sm" disabled>Delete</button></th>
-                          <th scope="col">
-                         <a class="btn btn-secondary btn-sm" href="{% url 'invoices' Lesson.id %}" role="button">Invoice</a></th>
-                         <th scope="col">
-                         <a class="btn btn-secondary btn-sm" href="{% url 'student_timetable' Lesson.id %}" role="button">Schedule</a></th>
-                         <th scope="col">
-                           <a class="btn btn-secondary btn-sm" href="{% url 'renew_lesson' Lesson.id %}" role="button">Renew
-                           </a></th>
-                      {% else %}
-
-                      <!--Delete and edit button-->
-                        <td>No</td>
-                        <th scope="col">
-                          <a class="btn btn-primary btn-sm"
-                          href="{% url 'edit-lesson' Lesson.id %}"
-                          role="button"
-                          >Edit</a></th>
-                        <th scope="col">
-                          <a class="btn btn-secondary btn-sm"
-                          href="{% url 'delete-lesson' Lesson.id %}"
-                          role="button">Delete</a>
-                        </th>
-                        <th scope="col">
-                          <button type="button" class="btn btn-secondary btn-sm" disabled>Invoice</button>
-                        </th>
-                        <th scope="col">
-                          <button type="button" class="btn btn-secondary btn-sm" disabled>Schedule</button>
-                        </th>
-                        <th scope="col">
-                          <button type="button" class="btn btn-secondary btn-sm" disabled>Renew</button>
-                        </th>
-                      {% endif %}
-                    </tr>
-                  {% endfor%}
-              </tbody>
-          </table>
+  <div class='row'>
+    <div class='col-md-10 col-md-6 offset-sm-1'>
+      <h1>Student Lessons Information</h1>
+      <!--Makes the table that will display lessons.-->
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Student</th>
+            <th scope="col">Lessons</th>
+            <th scope="col">Interval</th>
+            <th scope="col">Duration</th>
+            <th scope="col">Info</th>
+            <th scope="col">Approved</th>
+          </tr>
+        </thead>
+        <tbody>
+          <div class="Lesson">
+            <!--For loop goes through every student And adds it to the table.-->
+            {% for Lesson in student_lessons %}
+              <tr>
+                {% if Lesson.children %}
+                  <td>{{Lesson.children.first_name}} {{' '}} {{Lesson.children.last_name}}</td>
+                {% else %}
+                  <td>{{Lesson.user.first_name}} {{' '}} {{Lesson.user.last_name}}</td>
+                {% endif %}
+                <td>{{Lesson.lessons}}</td>
+                <td>{{Lesson.desiredInterval}}</td>
+                <td>{{Lesson.duration}}</td>
+                <td>{{Lesson.furtherInfo}}</td>
+                <!--Checks if the lesson is confirmed. Disables the button if it is.-->
+                {% if Lesson.is_confirmed %}
+                  <td>Yes</td>
+                  <th scope="col"><button type="button" class="btn btn-primary btn-sm" disabled>Edit</button></th>
+                  <th scope="col"><button type="button" class="btn btn-secondary btn-sm" disabled>Delete</button></th>
+                  <th scope="col"><a class="btn btn-secondary btn-sm" href="{% url 'invoices' Lesson.id %}" role="button">Invoice</a></th>
+                  <th scope="col"><a class="btn btn-secondary btn-sm" href="{% url 'student_timetable' Lesson.id %}" role="button">Schedule</a></th>
+                  <th scope="col"><a class="btn btn-secondary btn-sm" href="{% url 'renew_lesson' Lesson.id %}" role="button">Renew</a></th>
+                {% else %}
+                <!--Delete, edit and renew button-->
+                  <td>No</td>
+                  <th scope="col"><a class="btn btn-primary btn-sm" href="{% url 'edit-lesson' Lesson.id %}" role="button">Edit</a></th>
+                  <th scope="col"><a class="btn btn-secondary btn-sm" href="{% url 'delete-lesson' Lesson.id %}" role="button">Delete</a></th>
+                  <th scope="col"><button type="button" class="btn btn-secondary btn-sm" disabled>Invoice</button></th>
+                  <th scope="col"><button type="button" class="btn btn-secondary btn-sm" disabled>Schedule</button> </th>
+                  <th scope="col"><button type="button" class="btn btn-secondary btn-sm" disabled>Renew</button></th>
+                {% endif %}
+              </tr>
+            {% endfor%}
           </div>
-        </div>
+        </tbody>
+      </table>
     </div>
+  </div>
 </div>
 {% endblock %}

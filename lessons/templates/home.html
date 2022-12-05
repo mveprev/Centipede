@@ -5,23 +5,16 @@
         <div class="row h-100">
             <div class="col-12 my-auto">
                 <div class="card cover-card">
-                    <h1 class="cover-heading">Music School</h1>
-                    <p class="cover-text">Music School Manage System</p>
-                    <p>
-                        <a href = '{% url 'sign_up' %}' class="btn btn-lg btn-secondary">
-                            Sign up
-                        </a>
-                    </p>
-                    <p>
-                        <a href = '{% url 'log_in' %}' class="btn btn-lg btn-secondary">
-                            Log in
-                        </a>
-                    </p>
-                    <p>
-                        <a href = '{% url 'admin:lessons_user_changelist' %}' class="btn btn-lg btn-secondary">
-                            Director
-                        </a>
-                    </p>
+                    <p class="cover-text" style="font-weight:bold; text-align:center">Welcome to Mozart's Music School</p>
+                    <form action = "{% url 'home' %}" method="post">
+                        {% csrf_token %}
+                        {% include 'partials/bootstrap_form.html' with form=form %}
+                        {% include 'partials/messages.html' %}
+                        <input type="submit" value="Log in" class='btn btn-primary'>
+                    </form>
+                    <p></p><p></p>
+                    <div style="text-align:right">Do not have an account? <a href = '{% url 'sign_up' %}'>click here to sign up</a> </div>
+                    <div style="text-align:right">Are you a director? <a href = '{% url 'admin:lessons_user_changelist' %}'>click here to log in</a> </div>
                 </div>
             </div>
         </div>

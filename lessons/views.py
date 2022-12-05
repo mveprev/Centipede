@@ -13,26 +13,8 @@ from .models import User, Lesson, Children, TermDates, Schedule, Payment
 from .utils import Calendar
 import calendar
 
-'''Render the home page'''
+'''Render the home page with a log in form'''
 def home(request):
-    return render(request, 'home.html')
-
-
-'''Render the sign up pages (student sign up)'''
-def sign_up(request):
-    if request.method == 'POST':
-        form = SignUpForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(request, user)
-            return redirect('student_landing_page')
-    else:
-        form = SignUpForm()
-    return render(request, 'sign_up.html', {'form': form})
-
-
-'''Render the log in pages (student / teacher/ admin log in)'''
-def log_in(request):
     if request.method == 'POST':
         form = LogInForm(request.POST)
         if form.is_valid():
@@ -51,7 +33,20 @@ def log_in(request):
         # Add error message here
         messages.add_message(request, messages.ERROR, "The credentials provided were invalid")
     form = LogInForm()
-    return render(request, 'log_in.html', {'form': form})
+    return render(request, 'home.html', {'form':form})
+
+
+'''Render the sign up pages (student sign up)'''
+def sign_up(request):
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect('student_landing_page')
+    else:
+        form = SignUpForm()
+    return render(request, 'sign_up.html', {'form': form})
 
 
 '''For all user: log out'''
