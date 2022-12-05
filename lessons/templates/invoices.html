@@ -4,22 +4,18 @@
 
   <div id="Invoice">
       <div class="container mt-5">
-          <div><h1>Invoice:</h1> </div>
+          <div style="font-family:Copperplate; font-weight:bold"><h1>Your order:</h1> </div>
           <div>
               <table class="table">
+
                   <tr>
-                      <td style="font-family:Verdana, Geneva, sans-serif; font-weight:600; font-size:15px;">
-                              Student ID: {{Student_Id}}
-                      </td>
-                  </tr>
-                  <tr>
-                        <td style="font-family:Verdana, Geneva, sans-serif; font-weight:600; font-size:15px;">
-                            Invoice Number: {{Invoice_Id}}
+                        <td style="font-family:Didot, Geneva, sans-serif; font-weight:bold; font-size:18px;">
+                            Invoice Number: <tdtd style="font-family:Didot, Geneva, sans-serif; font-weight:600; font-size:17px;"> {{Invoice_Id}} </td>
                         </td>
                     </tr>
                     <tr>
-                        <td style="font-family:Verdana, Geneva, sans-serif; font-weight:600; font-size:15px;">
-                               Invoice Date: {{Invoice_dateAndTime}}
+                        <td style="font-family:Didot, Geneva, sans-serif; font-weight:600; font-size:18px;">
+                               Invoice Date: <tdtd style="font-family:Didot, Geneva, sans-serif; font-weight:600; font-size:17px;"> {{Invoice_dateAndTime}} </td>
                         </td>
 
                     </tr>
@@ -27,59 +23,62 @@
           </div>
 
             <table class="table" width="100%" border="0" cellspacing="0" cellpadding="0">
-
-
-                <div><h2>Purchase Details:</h2></div>
-                <table class="table" width="100%" border="0" cellspacing="0" cellpadding="0">
+                <div style="font-family:Copperplate; font-weight:bold"><h2>Student details:</h2></div>
                     <tr>
-                        <td style="font-family:Verdana, Geneva, sans-serif; font-weight:400; font-size:14px;">
-                            <b>School Name: </b>
+                        <td style="font-family:Didot, Geneva, sans-serif; font-weight:800; font-size:18px;">
+                            Student's Home School: Mozart's School of Music
                         </td>
-                        <td>
-                            Mozart's School of Music
+                    </tr>
+                    <tr>
+                        <td style="font-family:Didot, Geneva, sans-serif; font-weight:600; font-size:18px;">
+                                Student ID: <tdtd style="font-family:Didot, Geneva, sans-serif; font-weight:600; font-size:17px;"> {{Student_Id}}</td>
+
                         </td>
                     </tr>
                 <tr>
-                    <td style="font-family:Verdana, Geneva, sans-serif; font-weight:400; font-size:14px;">
-                        <b>Name</b>
-                    </td>
-                    <td>
-                        {{first_name}}  {{last_name}}
+                    <td style="font-family:Didot, Geneva, sans-serif; font-weight:600; font-size:18px;">
+                        Name: <tdtd style="font-family:Didot, Geneva, sans-serif; font-weight:600; font-size:17px;">{{first_name}}  {{last_name}}</td>
+
                     </td>
                 </tr>
                 <tr>
-                    <td>
-                        <b>Email Address</b>
-                    </td>
-                    <td>
-                        {{ email_address}}
+                    <td style="font-family:Didot, Geneva, sans-serif; font-weight:600; font-size:18px;">
+                        Email Address: <tdtd style="font-family:Didot, Geneva, sans-serif; font-weight:600; font-size:17px;">{{ email_address}}</td>
+
                     </td>
                 </tr>
 
-            <table width="80%" border="0" cellspacing="0" cellpadding="0">
-                <tr>
-                    <td style="font-family:Verdana, Geneva, sans-serif; font-weight:600; font-size:13px; border-top:1px solid #333; border-bottom:1px solid #333; border-left:1px solid #333; border-right:1px solid #333;"
-                        width="34%" height="32" align="center">Lesson Type</td>
-                    <td style="font-family:Verdana, Geneva, sans-serif; font-weight:600; font-size:13px; border-top:1px solid #333; border-bottom:1px solid #333; border-right:1px solid #333;"
-                        width="30%" align="center">Number of Lessons</td>
-                    <td style="font-family:Verdana, Geneva, sans-serif; font-weight:600; font-size:13px; border-top:1px solid #333; border-bottom:1px solid #333; border-right:1px solid #333;"
-                        width="30%" align="center">Cost per lesson</td>
-                </tr>
-                <tr>
-                    <td style="font-family:Verdana, Geneva, sans-serif; font-weight:300; font-size:13px; border-bottom:1px solid #333; border-left:1px solid #333; border-right:1px solid #333;"
-                        height="32" align="center">{{Lesson_type}}</td>
-                    <td style="font-family:Verdana, Geneva, sans-serif; font-weight:300; font-size:13px; border-bottom:1px solid #333; border-right:1px solid #333;"
-                        align="center">{{Number_of_lessons}}</td>
-                    <td style="font-family:Verdana, Geneva, sans-serif; font-weight:300; font-size:13px; border-bottom:1px solid #333; border-right:1px solid #333;"
-                        align="center">{{Cost_per_lesson}}</td>
-                </tr>
-                <tr>
-                    <td style="font-family:Verdana, Geneva, sans-serif; font-weight:600; font-size:13px; border-top:1px solid #333; border-bottom:1px solid #333; border-left:1px solid #333; border-right:1px solid #333;"
-                        width="34%" height="32" align="center">Grand Total</td>
-                    <td style="font-family:Verdana, Geneva, sans-serif; font-weight:600; font-size:13px; border-top:1px solid #333; border-bottom:1px solid #333; border-right:1px solid #333;"
-                        width="30%" align="center" colspan="2">{{Total_cost}}</td>
-                </tr>
-            </table>
+                <table class="table" width="100%" border="0" cellspacing="0" cellpadding="0">
+                    <div style="font-family:Copperplate; font-weight:bold"><h2> Lesson information:</h2></div>
+                        <tr>
+                            <td style="font-family:Didot, Geneva, sans-serif; font-weight:600; font-size:18px;">
+                                School Name: Mozart's School of Music
+                            </td>
+                        </tr>
+                    <tr>
+                        <td style="font-family:Didot, Geneva, sans-serif; font-weight:600; font-size:18px;">
+                            Lesson Type: <tdtd style="font-family:Didot, Geneva, sans-serif; font-weight:600; font-size:17px;">{{Lesson_type}}</td>
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-family:Didot, Geneva, sans-serif; font-weight:600; font-size:18px;">
+                            Number of lessons: <tdtd style="font-family:Didot, Geneva, sans-serif; font-weight:600; font-size:17px;">{{Number_of_lessons}}</td>
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-family:Didot, Geneva, sans-serif; font-weight:600; font-size:18px;">
+                            Cost per lesson: <tdtd style="font-family:Didot, Geneva, sans-serif; font-weight:600; font-size:17px;">{{Cost_per_lesson}}</td>
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-family:Didot, Geneva, sans-serif; font-weight:600; font-size:18px;">
+                            Total cost: <tdtd style="font-family:Didot, Geneva, sans-serif; font-weight:600; font-size:17px;">{{Total_cost}}</td>
+
+                        </td>
+                    </tr>
         </td>
     </tr>
 

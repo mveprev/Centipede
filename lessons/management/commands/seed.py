@@ -194,6 +194,7 @@ class Command(BaseCommand):
 
 # Function to create and input the dummy data.
 
+
     def handle(self, *args, **options):
         # print("The seed command has not been implemented yet!")
         # print("TO DO: Create a seed command following the instructions of the assignment carefully.")
@@ -206,6 +207,12 @@ class Command(BaseCommand):
         password_data = make_password('Password123')
 
         # Model Term Dates
+        term0 = TermDates.objects.create(
+            name="Term 0",
+            start_date=datetime.date(2022, 12, 1),
+            end_date=datetime.date(2022, 12, 12),
+        )
+
         term1 = TermDates.objects.create(
             name="Term 1",
             start_date=datetime.date(2022, 12, 13),
@@ -261,10 +268,10 @@ class Command(BaseCommand):
         )
 
         teacher3 = User.objects.create(
-            email="aisha.toumi@example.org",
+            email="norma.noe@example.org",
             password=password_data,
-            first_name="Aisha",
-            last_name="Toumi",
+            first_name="Norma",
+            last_name="Noe",
             is_teacher=True,
         )
 
@@ -311,31 +318,69 @@ class Command(BaseCommand):
 
         # Creation of John Doe's child's account and linking child to John Doe.
 
-        lisa = User.objects.create(
-            email="lisa.doe@example.org",
+        alice = User.objects.create(
+            email="alice.doe@example.org",
             password=password_data,
-            first_name="Lisa",
+            first_name="Alice",
             last_name="Doe",
         )
 
-        lisaChildren = Children.objects.create(
-            first_name=lisa.first_name,
-            last_name=lisa.last_name,
-            age=15,
-            email=lisa.email,
-            id=lisa.pk,
+        aliceChildren = Children.objects.create(
+            first_name=alice.first_name,
+            last_name=alice.last_name,
+            age=17,
+            email=alice.email,
+            id=alice.pk,
             parent=john,
         )
 
         # Creation of John Doe's child without an account
 
-        liamChildren = Children.objects.create(
-            first_name="Liam",
+        bobChildren = Children.objects.create(
+            first_name="Bob",
             last_name="Doe",
             age=12,
             id=self.faker.unique.random_int(),
             parent=john,
         )
+
+        now = datetime.datetime.now()
+
+        johnDoePastLesson = Lesson.objects.create(
+            term=term0,
+            mondayMorning=True,
+            lessons=1,
+            desiredInterval=7,
+            duration=30,
+            furtherInfo="I want to learn piano",
+            id=17,
+            user=john,
+            is_confirmed=True,
+            invoiceNum=(str(john.pk)[:4]).zfill(4) + "-" + (str(0)[:4]).zfill(4),
+            studentNum=(str(john.pk)[:4]).zfill(4),
+            invoiceEmail=john.email,
+        )
+
+        Schedule.objects.create(
+            teacher=teacher3,
+            lesson=johnDoePastLesson,
+            start_time=time(8, 30, 00),
+            start_date=term0.start_date,
+            interval=johnDoePastLesson.desiredInterval,
+            number_of_lessons=johnDoePastLesson.lessons,
+            duration=johnDoePastLesson.duration,
+        )
+        # Updating Payment View for John Doe
+
+        johnPastPayment = Payment.objects.create(
+            student=john,
+            amount_paid=30,
+            balance_before=-30,
+            balance_after=0,
+        )
+
+        john.outstanding_balance = johnPastPayment.balance_after
+        john.save()
 
         # Creation of lesson for deafult user John Doe
 
@@ -354,13 +399,9 @@ class Command(BaseCommand):
             invoiceEmail=john.email,
         )
 
-        # Creation of lesson invoice for John Doe
-        now = datetime.datetime.now()
-
         # Creation of Schedule for John Doe
         Schedule.objects.create(
-            # time_stamp=models.DateTimeField(auto_now=True),
-            teacher=teacher1,
+            teacher=teacher3,
             lesson=johnDoeLesson,
             start_time=time(8, 30, 00),
             start_date=term1.start_date,
@@ -371,17 +412,16 @@ class Command(BaseCommand):
         # Updating Payment View for John Doe
 
         johnPayment = Payment.objects.create(
-            payment_time=now,
             student=john,
             amount_paid=10,
             balance_before=-60,
             balance_after=-50,
         )
 
-        john.outstanding_balance = johnPayment.balance_after
+        john.outstanding_balance += johnPayment.balance_after
         john.save()
 
-        # Creation of lesson for deafult user Lisa Doe and Liam Doe
+        # Creation of lesson for John Doe's children user Alice Doe and non-user Bob Doe
 
         Lesson.objects.create(
             term=term1,
@@ -392,28 +432,91 @@ class Command(BaseCommand):
             furtherInfo="I want to learn piano",
             id=11,
             user=john,
-            children=lisaChildren,
+            children=aliceChildren,
             is_confirmed=False,
-            invoiceNum=(str(john.pk)[:4]).zfill(4) + "-" + (str(2)[:4]).zfill(4),
-            studentNum=(str(lisa.pk)[:4]).zfill(4),
+            invoiceNum=(str(john.pk)[:4]).zfill(4) + "-" + (str(3)[:4]).zfill(4),
+            studentNum=(str(alice.pk)[:4]).zfill(4),
             invoiceEmail=john.email,
         )
 
-        Lesson.objects.create(
-            term=term1,
+        pastAliceLesson = Lesson.objects.create(
+            term=term0,
+            tuesdayMorning=True,
+            lessons=1,
+            desiredInterval=30,
+            duration=45,
+            furtherInfo="I want to learn piano",
+            id=8,
+            user=john,
+            children=aliceChildren,
+            is_confirmed=True,
+            invoiceNum=(str(alice.pk)[:4]).zfill(4) + "-" + (str(2)[:4]).zfill(4),
+            studentNum=(str(alice.pk)[:4]).zfill(4),
+            invoiceEmail=alice.email,
+        )
+
+        Schedule.objects.create(
+            # time_stamp=models.DateTimeField(auto_now=True),
+            teacher=teacher3,
+            lesson=pastAliceLesson,
+            start_time=time(10, 30, 00),
+            start_date=term0.start_date,
+            interval=pastAliceLesson.desiredInterval,
+            number_of_lessons=pastAliceLesson.lessons,
+            duration=pastAliceLesson.duration,
+        )
+
+        # Updating Payment View for Alice Doe
+
+        alicePayment = Payment.objects.create(
+            student=alice,
+            amount_paid=45,
+            balance_before=-45,
+            balance_after=0,
+        )
+
+        alice.outstanding_balance = alicePayment.balance_after
+        alice.save()
+
+    # Creation of past Lesson for Bob Doee
+
+        pastBobLesson = Lesson.objects.create(
+            term=term0,
             mondayMorning=True,
-            lessons=2,
-            desiredInterval=7,
+            lessons=1,
+            desiredInterval=30,
             duration=30,
             furtherInfo="I want to learn piano",
             id=12,
             user=john,
-            children=liamChildren,
-            is_confirmed=False,
+            children=bobChildren,
+            is_confirmed=True,
             invoiceNum=(str(john.pk)[:4]).zfill(4) + "-" + (str(1)[:4]).zfill(4),
             studentNum=(str(john.pk)[:4]).zfill(4),
             invoiceEmail=john.email,
         )
+
+        Schedule.objects.create(
+            teacher=teacher1,
+            lesson=pastBobLesson,
+            start_time=time(8, 30, 00),
+            start_date=term0.start_date,
+            interval=pastBobLesson.desiredInterval,
+            number_of_lessons=pastBobLesson.lessons,
+            duration=pastBobLesson.duration,
+        )
+
+        # Updating Payment View for John Doe on behalf of Bob Doe
+
+        Payment.objects.create(
+            student=john,
+            amount_paid=30,
+            balance_before=-30,
+            balance_after=0,
+        )
+
+        john.outstanding_balance += johnPayment.balance_after
+        john.save()
 
         # Creation of random users and data using faker.
 
@@ -568,22 +671,22 @@ class Command(BaseCommand):
 
             # Creation of Schedule for seeded usrs
             form_input = {
-                'teacher':teacherGenerator(self, self.faker.lesson_teachers()),
-                'start_time':time(self.faker.lesson_hours(), 00, 00),
-                'start_date':startDate,
-                'interval':userLesson.desiredInterval,
-                'number_of_lessons':userLesson.lessons,
-                'duration':userLesson.duration,
+                'teacher': teacherGenerator(self, self.faker.lesson_teachers()),
+                'start_time': time(self.faker.lesson_hours(), 00, 00),
+                'start_date': startDate,
+                'interval': userLesson.desiredInterval,
+                'number_of_lessons': userLesson.lessons,
+                'duration': userLesson.duration,
             }
             form = ScheduleForm(data=form_input)
             while not form.is_valid():
                 form_input = {
-                    'teacher':teacherGenerator(self, self.faker.lesson_teachers()),
-                    'start_time':time(self.faker.lesson_hours(), 00, 00),
-                    'start_date':startDate,
-                    'interval':userLesson.desiredInterval,
-                    'number_of_lessons':userLesson.lessons,
-                    'duration':userLesson.duration,
+                    'teacher': teacherGenerator(self, self.faker.lesson_teachers()),
+                    'start_time': time(self.faker.lesson_hours(), 00, 00),
+                    'start_date': startDate,
+                    'interval': userLesson.desiredInterval,
+                    'number_of_lessons': userLesson.lessons,
+                    'duration': userLesson.duration,
                 }
                 form = ScheduleForm(data=form_input)
 
@@ -602,7 +705,6 @@ class Command(BaseCommand):
                     duration=newSchedule.duration,
                 )
                 subSchedule.save()
-            
 
             # Updating Payment View for seeded usrs
             payment = self.faker.lesson_payments()
