@@ -62,15 +62,14 @@
                           role="button">Delete</a>
                         </th>
                         <th scope="col">
-                    <button type="button" class="btn btn-secondary btn-sm" disabled>Invoice</button>
+                          <button type="button" class="btn btn-secondary btn-sm" disabled>Invoice</button>
                         </th>
                         <th scope="col">
-                    <button type="button" class="btn btn-secondary btn-sm" disabled>Schedule</button>
+                          <button type="button" class="btn btn-secondary btn-sm" disabled>Schedule</button>
                         </th>
-                        <th>
-                        <a class="btn btn-secondary btn-sm" href="{% url 'renew_lesson' Lesson.id %}" role="button">Renew
-                        </a></th>
-
+                        <th scope="col">
+                          <button type="button" class="btn btn-secondary btn-sm" disabled>Renew</button>
+                        </th>
                       {% endif %}
                     </tr>
                   {% endfor%}
