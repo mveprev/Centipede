@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from calendar import HTMLCalendar
 from .models import Schedule
 
+'''Create a calendar'''
 class Calendar(HTMLCalendar):
     def __init__(self, user, year=None, month=None):
         self.year = year
