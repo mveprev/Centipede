@@ -1,10 +1,10 @@
-from django.db import models
+"""Models in the Lessons app."""
 
+from django.db import models
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin, User
-from django.core.validators import MaxValueValidator, MinValueValidator
 from msms import settings
-# Create your models here.
+
 
 
 class UserManager(BaseUserManager):
@@ -42,7 +42,8 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-
+    """User model used for authentication"""
+    
     email = models.EmailField(
         unique=True,
         max_length=50,
@@ -60,6 +61,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'email'
 
 class Children(models.Model):
+    """Children model used for child details"""
+
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     age = models.IntegerField(blank=False)
@@ -67,12 +70,17 @@ class Children(models.Model):
     id = models.AutoField(primary_key=True, unique=True)
     parent = models.ForeignKey(User, on_delete=models.CASCADE)
 
+
 class TermDates(models.Model):
+    """Model used for term dates """
+
     name = models.CharField(max_length = 50, default = 'default', unique=True)
     start_date = models.DateField()
     end_date = models.DateField()
 
 class Lesson(models.Model):
+    """Lesson model used for booking lessons"""
+
     term = models.ForeignKey(TermDates, on_delete=models.CASCADE, null=True)
 
     mondayMorning = models.BooleanField(default=False)
@@ -104,6 +112,8 @@ class Lesson(models.Model):
     invoiceEmail = models.CharField(max_length = 50, default = 'default')
 
 class Schedule(models.Model):
+    """Model for schedule details"""
+
     time_stamp = models.DateTimeField(auto_now = True)
     teacher = models.ForeignKey(User, on_delete=models.CASCADE)
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
@@ -113,12 +123,10 @@ class Schedule(models.Model):
     number_of_lessons = models.IntegerField(blank=False)
     duration = models.IntegerField(blank=False)
 
-class Renewal(models.Model):
-    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
-    renew = models.BooleanField(default=True)
-    #renewDate = models.DateField(lesson.term.end_date)
 
 class Payment(models.Model):
+    """Model for payment details"""
+
     payment_time = models.DateTimeField(auto_now = True)
     student = models.ForeignKey(User, on_delete=models.CASCADE)
     amount_paid = models.IntegerField(blank=False)

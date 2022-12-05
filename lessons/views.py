@@ -249,7 +249,20 @@ def delete_booking(request, lessonId):
 
 def renew_lesson(request, lessonId):
     lesson = Lesson.objects.get(id=lessonId)
-    return render(request, 'student_renewal_settings.html', {'lesson': lesson})
+    terms = TermDates.objects.all()
+    
+    newKey = lesson.term.pk + 1
+    if  terms.filter(id = newKey).exists()==False:
+        messages.add_message(request, messages.ERROR, "There is no further term")
+    else:
+        lesson.id = None
+        lesson.term = terms.get(id = newKey)
+        lesson.user = request.user
+        lesson.save()
+    
+    
+    lessonsList = Lesson.objects.all()
+    return render(request, 'student_lessons.html', {'student_lessons': lessonsList})
 
 
 def add_children(request):

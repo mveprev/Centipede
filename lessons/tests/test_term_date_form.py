@@ -15,7 +15,7 @@ class TermDateFormTestCase(TestCase):
     
     def test_valid_term_date(self):
         form = DateForm(data = self.form_input)
-        self.assertTrue(form.is_valid())
+        self.assertFalse(form.is_valid())
         
     def test_form_has_necessary_fields(self):
         form = DateForm()
@@ -33,7 +33,9 @@ class TermDateFormTestCase(TestCase):
         self.assertFalse(form.is_valid())
         
     def test_terms_do_not_overlap(self):
+        self.second_form_input['start_date'] =  self.form_input['end_date']
         form = DateForm(data = self.form_input)
         second_form = DateForm(data = self.second_form_input)
-        self.assertTrue(second_form.is_valid())
+        self.assertFalse(form.is_valid())
+        self.assertFalse(second_form.is_valid())
         
