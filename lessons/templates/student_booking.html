@@ -1,0 +1,79 @@
+{% extends 'student_base_content.html' %}
+{% block student_content %}
+{% load crispy_forms_filters %} 
+{% load crispy_forms_tags %}
+<div class='container'>
+    <div class='row'>
+        <div class='col-7 offset-md-2'>
+            <h1>Student Lessons Booking</h1>
+            <form action = "{% url 'student_booking' %}" method="POST">
+                {% csrf_token %}
+                <p>
+                    {{form.term|as_crispy_field}}
+                </p>
+                <p>
+                    {{form.children|as_crispy_field}}
+                </p>
+                <p>
+                    <p><b>Monday:</b></p>
+                    {{form.mondayMorning.label}}
+                    {{form.mondayMorning}}
+                    {{form.mondayAfternoon.label}}
+                    {{form.mondayAfternoon}}
+                    {{form.mondayNight.label}}
+                    {{form.mondayNight}}
+                </p>
+                <p>
+                    <p><b>Tuesday:</b></p>
+                    {{form.tuesdayMorning.label}}
+                    {{form.tuesdayMorning}}
+                    {{form.tuesdayAfternoon.label}}
+                    {{form.tuesdayAfternoon}}
+                    {{form.tuesdayNight.label}}
+                    {{form.tuesdayNight}}
+                </p>
+                <p>
+                    <p><b>Wednesday:</b></p>
+                    {{form.wednesdayMorning.label}}
+                    {{form.wednesdayMorning}}
+                    {{form.wednesdayAfternoon.label}}
+                    {{form.wednesdayAfternoon}}
+                    {{form.wednesdayNight.label}}
+                    {{form.wednesdayNight}}
+                </p>
+                <p>
+                    <p><b>Thursday:</b></p>
+                    {{form.thursdayMorning.label}}
+                    {{form.thursdayMorning}}
+                    {{form.thursdayAfternoon.label}}
+                    {{form.thursdayAfternoon}}
+                    {{form.thursdayNight.label}}
+                    {{form.thursdayNight}}
+                </p>
+                <p>
+                    <p><b>Friday:</b></p>
+                    {{form.fridayMorning.label}}
+                    {{form.fridayMorning}}
+                    {{form.fridayAfternoon.label}}
+                    {{form.fridayAfternoon}}
+                    {{form.fridayNight.label}}
+                    {{form.fridayNight}}
+                </p>
+                <p>
+                    {{form.lessons|as_crispy_field}}
+                </p>
+                <p>
+                    {{form.duration|as_crispy_field}}
+                </p>
+                <p>
+                    {{form.desiredInterval|as_crispy_field}}
+                </p>
+                <p>
+                    {{form.furtherInfo|as_crispy_field}}
+                </p>
+                <input type="submit" value="Submit" class='btn btn-primary'>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
