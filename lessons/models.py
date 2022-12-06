@@ -8,6 +8,7 @@ from msms import settings
 
 
 class UserManager(BaseUserManager):
+    """Manage user model objects"""
 
     use_in_migrations = True
 

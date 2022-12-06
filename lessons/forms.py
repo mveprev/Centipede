@@ -60,10 +60,14 @@ class SignUpForm(forms.ModelForm):
 
 
 class CustomChildren(forms.ModelChoiceField):
+    """Custom the children label in lesson form."""
+
     def label_from_instance(self, children):
         return children.first_name + ' ' + children.last_name
 
 class CustomTerm(forms.ModelChoiceField):
+    """Custom the term label in lesson form."""
+
     def label_from_instance(self, term):
         return term.name
 
