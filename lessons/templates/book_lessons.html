@@ -4,6 +4,8 @@
     <div class='row'>
         <div class='col-6 offset-3'>
             <h1>Student Requirement</h1>
+            <strong>Term:</strong>
+            <p>{{lesson.term.name}}: {{lesson.term.start_date}} to {{lesson.term.end_date}}</p>
             <strong>Availability:</strong>
             <p>
                 {% if lesson.mondayMorning %}

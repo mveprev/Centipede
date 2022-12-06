@@ -69,7 +69,7 @@ class CustomTerm(forms.ModelChoiceField):
     """Custom the term label in lesson form."""
 
     def label_from_instance(self, term):
-        return term.name
+        return term.name + ': ' + str(term.start_date) + ' to ' + str(term.end_date)
 
 class LessonForm(forms.ModelForm):
     """Form to ask user for fill in a lesson."""
@@ -87,7 +87,9 @@ class LessonForm(forms.ModelForm):
         interval = self.cleaned_data.get('desiredInterval')
         term_length = (currentTerm.end_date - currentTerm.start_date).days
         if (number_of_lessons-1) * interval > term_length:
-            self.add_error('lessons', 'Too much lessons, this term is not long enough!')
+            self.add_error('lessons', 'Too much lessons, this term is not long enough')
+        if datetime.now().date()>currentTerm.end_date:
+            self.add_error('term', 'This term has ended')
 
     class Meta:
         """Form options."""
