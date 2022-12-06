@@ -24,6 +24,7 @@ urlpatterns = [
     path('sign_up/', views.sign_up, name='sign_up'),
     path('teacher_landing_page/', views.CalendarView.as_view(), name='teacher_landing_page'),
     path('student_landing_page/', views.student_landing_page, name='student_landing_page'),
+    path('student_booking/', views.student_booking, name='student_booking'),
     path('student_lessons/', views.student_lessons, name='student_lessons'),
     path('student_payment/', views.student_payment, name='student_payment'),
     path('admin_landing_page/', views.admin_landing_page, name='admin_landing_page'),

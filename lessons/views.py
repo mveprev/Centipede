@@ -47,7 +47,7 @@ def sign_up(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            return redirect('student_landing_page')
+            return redirect('student_booking')
     else:
         form = SignUpForm()
     return render(request, 'sign_up.html', {'form': form})
@@ -82,11 +82,16 @@ def createLessonList(currentUser):
         children__in=asChild) | Lesson.objects.filter(children__in=allChildren) | Lesson.objects.filter(user__in=childUser)
     return lessonsList
 
-
-'''For student user: ender the landing page with a form, to request a lesson'''
+'''For student user: render the landing page'''
 
 
 def student_landing_page(request):
+    return render(request, 'student_landing_page.html')
+
+'''For student user: ender the booking page with a form, to request a lesson'''
+
+
+def student_booking(request):
     if request.method == "POST":
         form = LessonForm(data=request.POST, request=request)
         if form.is_valid():
@@ -94,10 +99,10 @@ def student_landing_page(request):
             lesson.user = request.user
             lesson.invoiceEmail = request.user.email
             lesson.save()
-            return redirect('student_landing_page')
+            return redirect('student_booking')
     else:
         form = LessonForm(request=request)
-    return render(request, 'student_landing_page.html', {'form': form})
+    return render(request, 'student_booking.html', {'form': form})
 
 
 '''For student user: show a list of lessons'''
