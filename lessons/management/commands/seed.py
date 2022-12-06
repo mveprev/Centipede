@@ -194,14 +194,7 @@ class Command(BaseCommand):
 
 # Function to create and input the dummy data.
 
-
     def handle(self, *args, **options):
-        # print("The seed command has not been implemented yet!")
-        # print("TO DO: Create a seed command following the instructions of the assignment carefully.")
-        #
-        # print(self.faker.address())
-        # print(self.faker.ascii_free_email())
-        # print(self.faker.music_school_instruments())
 
         # Model account passwords
         password_data = make_password('Password123')
@@ -566,9 +559,6 @@ class Command(BaseCommand):
 
         for _ in range(0, 43):
 
-            # password_data_general = self.faker.password(
-            #     length=11, special_chars=True, upper_case=True)
-
             first_name = self.faker.first_name()
             last_name = self.faker.last_name()
             email = first_name.lower() + "-" + last_name.lower() + \
@@ -606,9 +596,8 @@ class Command(BaseCommand):
                 furtherInfo="I want to learn " + self.faker.music_school_instruments(),
                 id=self.faker.unique.random_int(),
                 user=newUser,
-                # children=liamChildren,
                 is_confirmed=False,
-                invoiceNum=(str(newUser.pk)[:4]).zfill(4) + "-" + \
+                invoiceNum=(str(newUser.pk)[:4]).zfill(4) + "-" +
                 (str(self.faker.unique.random_int())[:4]).zfill(4),
                 studentNum=(str(newUser.pk)[:4]).zfill(4),
                 invoiceEmail=newUser.email,
@@ -617,9 +606,6 @@ class Command(BaseCommand):
             # Creation of seeded users with confirmed lessons and payments.
 
         for _ in range(0, 50):
-
-            # password_data_general = self.faker.password(
-            #     length=11, special_chars=True, upper_case=True)
 
             first_name = self.faker.first_name()
             last_name = self.faker.last_name()
@@ -658,9 +644,8 @@ class Command(BaseCommand):
                 furtherInfo="I want to learn " + self.faker.music_school_instruments(),
                 id=self.faker.unique.random_int(),
                 user=newUser,
-                # children=liamChildren,
                 is_confirmed=True,
-                invoiceNum=(str(newUser.pk)[:4]).zfill(4) + "-" + \
+                invoiceNum=(str(newUser.pk)[:4]).zfill(4) + "-" +
                 (str(self.faker.unique.random_int())[:4]).zfill(4),
                 studentNum=(str(newUser.pk)[:4]).zfill(4),
                 invoiceEmail=newUser.email,
