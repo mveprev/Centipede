@@ -12,7 +12,7 @@ The members of the team are:
 The project is called `msms` (Music School Management System).  It currently consists of a single app `lessons` where all functionality resides.
 
 ## Deployed version of the application
-The deployed version of the application can be found at *[http://guyvandijken.pythonanywhere.com/](URL)*.
+The deployed version of the application can be found at *http://guyvandijken.pythonanywhere.com/*.
 
 ## Installation instructions
 To install the software and use it in your local development environment, you must first set up and activate a local development environment.  From the root of the project:
@@ -52,4 +52,4 @@ The packages used by this application are specified in `requirements.txt`
 
 utils.py from Line0 to Line36 and views.py from Line489 to Line532 implement the Calendar function for Teacher Timetable. Reference link: 
 - *https://www.huiwenteo.com/normal/2018/07/24/django-calendar.html* 
-- *[https://www.huiwenteo.com/normal/2018/07/29/django-calendar-ii.html](URL)*
+- *https://www.huiwenteo.com/normal/2018/07/29/django-calendar-ii.html*
