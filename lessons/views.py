@@ -14,6 +14,8 @@ from .utils import Calendar
 import calendar
 
 '''Render the home page with a log in form'''
+
+
 def home(request):
     if request.method == 'POST':
         form = LogInForm(request.POST)
@@ -33,10 +35,12 @@ def home(request):
         # Add error message here
         messages.add_message(request, messages.ERROR, "The credentials provided were invalid")
     form = LogInForm()
-    return render(request, 'home.html', {'form':form})
+    return render(request, 'home.html', {'form': form})
 
 
 '''Render the sign up pages (student sign up)'''
+
+
 def sign_up(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
@@ -50,6 +54,8 @@ def sign_up(request):
 
 
 '''For all user: log out'''
+
+
 def log_out(request):
     logout(request)
     return redirect('home')
@@ -62,6 +68,8 @@ Function to create a list of lessons of:
 - Lesson booked by user's children (for himself)
 - Lesson booked by user's children's other parent (for these children)
 '''
+
+
 def createLessonList(currentUser):
     asChild = Children.objects.filter(email=currentUser.email)
     myChildrenEmail = Children.objects.filter(parent=currentUser).values('email')
@@ -70,11 +78,14 @@ def createLessonList(currentUser):
     else:
         allChildren = Children.objects.none()
     childUser = User.objects.filter(email__in=myChildrenEmail)
-    lessonsList = Lesson.objects.filter(user=currentUser) | Lesson.objects.filter(children__in=asChild) | Lesson.objects.filter(children__in=allChildren) | Lesson.objects.filter(user__in=childUser)
+    lessonsList = Lesson.objects.filter(user=currentUser) | Lesson.objects.filter(
+        children__in=asChild) | Lesson.objects.filter(children__in=allChildren) | Lesson.objects.filter(user__in=childUser)
     return lessonsList
 
 
 '''For student user: ender the landing page with a form, to request a lesson'''
+
+
 def student_landing_page(request):
     if request.method == "POST":
         form = LessonForm(data=request.POST, request=request)
@@ -90,6 +101,8 @@ def student_landing_page(request):
 
 
 '''For student user: show a list of lessons'''
+
+
 def student_lessons(request):
     if request.user.is_authenticated:
         lessonsList = createLessonList(request.user)
@@ -99,6 +112,8 @@ def student_lessons(request):
 
 
 '''For student user: show the balance of user and a list of payment'''
+
+
 def student_payment(request):
     if request.user.is_authenticated:
         currentUser = request.user
@@ -109,6 +124,8 @@ def student_payment(request):
 
 
 '''For student user: edit the lesson with the form'''
+
+
 def edit_lesson(request, lessonId):
     lesson = Lesson.objects.get(id=lessonId)
     form = LessonForm(data=request.POST or None, request=request, instance=lesson)
@@ -122,6 +139,8 @@ def edit_lesson(request, lessonId):
 
 
 '''For student user: delete the lesson'''
+
+
 def delete_lesson(request, lessonId):
     lesson = Lesson.objects.get(id=lessonId)
     lesson.delete()
@@ -133,15 +152,17 @@ def delete_lesson(request, lessonId):
 
 
 '''For student user: renew the lesson for next term'''
+
+
 def renew_lesson(request, lessonId):
     lesson = Lesson.objects.get(id=lessonId)
     terms = TermDates.objects.all()
     newKey = lesson.term.pk + 1
-    if  terms.filter(id = newKey).exists()==False:
+    if terms.filter(id=newKey).exists() == False:
         messages.add_message(request, messages.ERROR, "There is no further term")
     else:
         lesson.id = None
-        lesson.term = terms.get(id = newKey)
+        lesson.term = terms.get(id=newKey)
         lesson.is_confirmed = False
         lesson.save()
     lessonsList = createLessonList(request.user)
@@ -149,6 +170,8 @@ def renew_lesson(request, lessonId):
 
 
 '''For student user: add children with a form'''
+
+
 def add_children(request):
     if request.method == "POST":
         form = ChildrenForm(request.POST)
@@ -163,6 +186,8 @@ def add_children(request):
 
 
 '''For student user: show a list of their children'''
+
+
 def my_children(request):
     if request.user.is_authenticated:
         currentUser = request.user
@@ -173,6 +198,8 @@ def my_children(request):
 
 
 '''For student user: delete their children'''
+
+
 def delete_children(request, childrenId):
     child = Children.objects.get(id=childrenId)
     child.delete()
@@ -185,17 +212,23 @@ def delete_children(request, childrenId):
 
 
 '''For admin user: render the landing page'''
+
+
 def admin_landing_page(request):
     return render(request, 'admin_landing_page.html')
 
 
 '''For admin user: render the lesson page with a list of all lessons'''
+
+
 def admin_lessons(request):
     lessonsList = Lesson.objects.all()
     return render(request, 'admin_lessons.html', {'admin_lessons': lessonsList})
 
 
 '''For admin user: fulfil the lesson request with a form'''
+
+
 def book_lesson(request, lessonId):
     lesson = Lesson.objects.get(id=lessonId)
     form = ScheduleForm(data=request.POST or None)
@@ -235,6 +268,8 @@ def book_lesson(request, lessonId):
 
 
 '''For admin user: edit the booked lessons with a form'''
+
+
 def edit_booking(request, lessonId):
     lesson = Lesson.objects.get(id=lessonId)
     schedules = Schedule.objects.filter(lesson=lesson)
@@ -281,6 +316,8 @@ def edit_booking(request, lessonId):
 
 
 '''For admin user: delete the booked lessons'''
+
+
 def delete_booking(request, lessonId):
     lesson = Lesson.objects.get(id=lessonId)
     schedules = Schedule.objects.filter(lesson=lesson)
@@ -297,12 +334,16 @@ def delete_booking(request, lessonId):
 
 
 '''For admin user: render the payment page with a list of payment'''
+
+
 def admin_payment(request):
     studentList = User.objects.filter(is_teacher=False, is_staff=False, is_superuser=False)
     return render(request, 'admin_payment.html', {'admin_payment': studentList})
 
 
 '''For admin user: add term date with a form'''
+
+
 def term_dates(request):
     form = DateForm(request.POST)
     if request.method == "POST":
@@ -314,12 +355,16 @@ def term_dates(request):
 
 
 '''For admin user: render the term date page with a list of terms'''
+
+
 def view_term_dates(request):
     terms = TermDates.objects.all()
     return render(request, 'view_term_dates.html', {"term_dates": terms})
 
 
 '''For admin user: edit the term date with a form'''
+
+
 def edit_term_dates(request, term_id):
     term = TermDates.objects.get(pk=term_id)
     form = DateForm(data=request.POST or None, instance=term)
@@ -333,6 +378,8 @@ def edit_term_dates(request, term_id):
 
 
 '''For admin user: delete the term dates'''
+
+
 def delete_term_dates(request, term_id):
     term = TermDates.objects.get(pk=term_id)
     term.delete()
@@ -341,6 +388,8 @@ def delete_term_dates(request, term_id):
 
 
 '''For admin user: make payment for student with a form'''
+
+
 def make_payment(request, userId):
     student = User.objects.get(id=userId)
     form = PaymentForm(data=request.POST or None)
@@ -362,6 +411,8 @@ def make_payment(request, userId):
 
 
 '''For student user: generate the invoice PDF'''
+
+
 def invoice_generator(request, lessonId):
     currentUser = request.user
     currentLesson = Lesson.objects.get(id=lessonId)
@@ -404,6 +455,8 @@ def invoice_generator(request, lessonId):
 
 
 '''For student user: generate the booked lesson detail PDF'''
+
+
 def lesson_detail_generator(request, lessonId):
     currentLesson = Lesson.objects.get(id=lessonId)
     schedules = Schedule.objects.filter(lesson=currentLesson)
@@ -414,12 +467,15 @@ def lesson_detail_generator(request, lessonId):
         "Start_time": currentSchedule.start_time,
         "Interval": currentSchedule.interval,
         "Duration": currentSchedule.duration,
-        "Teacher": currentSchedule.teacher
+        "Teacher": currentSchedule.teacher.first_name + " " + currentSchedule.teacher.last_name,
+        "Teacher_Email": currentSchedule.teacher
     }
     return render(request, 'student_timetable.html', information)
 
 
 '''Render the calendar'''
+
+
 class CalendarView(generic.ListView):
     model = Schedule
     template_name = 'teacher_landing_page.html'
@@ -436,6 +492,8 @@ class CalendarView(generic.ListView):
 
 
 '''Function used to change to the previous month in the calendar'''
+
+
 def prev_month(d):
     first = d.replace(day=1)
     prev_month = first - timedelta(days=1)
@@ -444,6 +502,8 @@ def prev_month(d):
 
 
 '''Function used to change to the next month in the calendar'''
+
+
 def next_month(d):
     days_in_month = calendar.monthrange(d.year, d.month)[1]
     last = d.replace(day=days_in_month)
@@ -453,6 +513,8 @@ def next_month(d):
 
 
 '''Function used to return the date'''
+
+
 def get_date(req_day):
     if req_day:
         year, month = (int(x) for x in req_day.split('-'))

@@ -2,11 +2,18 @@
 
 {% block student_content %}
 
+<div class="container mt-5">
+<div class="center">
+    <img src="https://pixabay.com/get/g54d6317731e925071168eddba160b80829b1f2b1f2b4736edb80cd252da5b305aa333af585a9527d5140fc62ac172bbb8bedc312be31ef7a1e696365124f9d998476196bbace3419b2027c34200c1ec2_640.png"
+    width="125" style="display: block; margin-left: auto; margin-right: auto;">
+</div>
+</div>
+
   <div id="Invoice">
-      <div class="container mt-5">
+      <div class="container">
           <div style="font-family:Copperplate; font-weight:bold"><h1>Your order:</h1> </div>
           <div>
-              <table class="table">
+              <table class="table" width="100%" border="15" cellspacing="0" cellpadding="0">
 
                   <tr>
                         <td style="font-family:Didot, Geneva, sans-serif; font-weight:bold; font-size:18px;">
@@ -23,7 +30,7 @@
           </div>
 
             <table class="table" width="100%" border="0" cellspacing="0" cellpadding="0">
-                <div style="font-family:Copperplate; font-weight:bold"><h2>Student details:</h2></div>
+                <div style="font-family:Copperplate; font-weight:bold"><h2>Student information:</h2></div>
                     <tr>
                         <td style="font-family:Didot, Geneva, sans-serif; font-weight:800; font-size:18px;">
                             Student's Home School: Mozart's School of Music
@@ -37,7 +44,7 @@
                     </tr>
                 <tr>
                     <td style="font-family:Didot, Geneva, sans-serif; font-weight:600; font-size:18px;">
-                        Name: <tdtd style="font-family:Didot, Geneva, sans-serif; font-weight:600; font-size:17px;">{{first_name}}  {{last_name}}</td>
+                        Full Name: <tdtd style="font-family:Didot, Geneva, sans-serif; font-weight:600; font-size:17px;">{{first_name}}  {{last_name}}</td>
 
                     </td>
                 </tr>
@@ -63,25 +70,29 @@
                     </tr>
                     <tr>
                         <td style="font-family:Didot, Geneva, sans-serif; font-weight:600; font-size:18px;">
-                            Number of lessons: <tdtd style="font-family:Didot, Geneva, sans-serif; font-weight:600; font-size:17px;">{{Number_of_lessons}}</td>
+                            Number of Lessons: <tdtd style="font-family:Didot, Geneva, sans-serif; font-weight:600; font-size:17px;">{{Number_of_lessons}}</td>
 
                         </td>
                     </tr>
                     <tr>
                         <td style="font-family:Didot, Geneva, sans-serif; font-weight:600; font-size:18px;">
-                            Cost per lesson: <tdtd style="font-family:Didot, Geneva, sans-serif; font-weight:600; font-size:17px;">{{Cost_per_lesson}}</td>
+                            Cost Per Lesson: <tdtd style="font-family:Didot, Geneva, sans-serif; font-weight:600; font-size:17px;">{{Cost_per_lesson}}</td>
 
                         </td>
                     </tr>
-                    <tr>
-                        <td style="font-family:Didot, Geneva, sans-serif; font-weight:600; font-size:18px;">
-                            Total cost: <tdtd style="font-family:Didot, Geneva, sans-serif; font-weight:600; font-size:17px;">{{Total_cost}}</td>
 
-                        </td>
-                    </tr>
         </td>
     </tr>
 
+    </table>
+
+    <table class="table" width="100%" border="15" cellspacing="0" cellpadding="0">
+        <tr>
+            <td style="font-family:Didot, Geneva, sans-serif; font-weight:600; font-size:18px;">
+                Total: <tdtd style="font-family:Didot, Geneva, sans-serif; font-weight:600; font-size:17px;">{{Total_cost}}</td>
+
+            </td>
+        </tr>
     </table>
 </div>
 

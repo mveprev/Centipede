@@ -2,11 +2,62 @@
 
 {% block student_content %}
 
-<p>Number of lessons: {{Number_of_lessons}}</p>
-<p>Start date: {{Start_date}}</p>
-<p>Start time: {{Start_time}}</p>
-<p>Interval: {{Interval}} days</p>
-<p>Duration: {{Duration}} minutes</p>
-<p>Teacher: {{Teacher}}</p>
+
+<div class="center">
+    <img src=https://cdn.pixabay.com/photo/2014/04/03/11/37/notes-311995_960_720.png
+    width="250" style="display: block; margin-left: auto; margin-right: auto;">
+</div>
+</div>
+
+<table class="table" width="100%" border="5" cellspacing="0" cellpadding="0">
+    <div style="font-family:Copperplate; font-weight:bold;"><h2>Lesson information:</h2></div>
+        <tr>
+            <td style="font-family:Didot, Geneva, sans-serif; font-weight:800; font-size:18px;">
+                Start date: {{Start_date}}
+            </td>
+        </tr>
+        <tr>
+            <td style="font-family:Didot, Geneva, sans-serif; font-weight:600; font-size:18px;">
+                    Start time: {{Start_time}}
+
+            </td>
+        </tr>
+    <tr>
+        <td style="font-family:Didot, Geneva, sans-serif; font-weight:600; font-size:18px;">
+            Duration: {{Duration}} minutes
+
+        </td>
+    </tr>
+    <tr>
+        <td style="font-family:Didot, Geneva, sans-serif; font-weight:600; font-size:18px;">
+            Number of lessons: {{Number_of_lessons}}
+
+        </td>
+    </tr>
+    <tr>
+        <td style="font-family:Didot, Geneva, sans-serif; font-weight:600; font-size:18px;">
+            Interval: {{Interval}} days
+
+        </td>
+    </tr>
+    <tr>
+        <td style="font-family:Didot, Geneva, sans-serif; font-weight:600; font-size:18px;">
+            Teacher: {{Teacher}}
+
+        </td>
+    </tr>
+    <tr>
+        <td style="font-family:Didot, Geneva, sans-serif; font-weight:600; font-size:18px;">
+            Teacher Email: {{Teacher_Email}}
+
+        </td>
+    </tr>
+</table>
+
+<div class="center">
+    <img src="https://cdn.pixabay.com/photo/2019/06/24/15/13/guitar-4296254_960_720.png"
+    width="250" style="display: block; margin-left: auto; margin-right: auto;">
+</div>
+</div>
 
 {% endblock %}
