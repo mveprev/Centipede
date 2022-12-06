@@ -9,6 +9,7 @@
         <thead>
           <tr>
             <th scope="col">Student</th>
+            <th scope="col">Term</th>
             <th scope="col">Lessons</th>
             <th scope="col">Interval</th>
             <th scope="col">Duration</th>
@@ -26,6 +27,7 @@
                 {% else %}
                   <td>{{Lesson.user.first_name}} {{' '}} {{Lesson.user.last_name}}</td>
                 {% endif %}
+                <td>{{Lesson.term}}</td>
                 <td>{{Lesson.lessons}}</td>
                 <td>{{Lesson.desiredInterval}}</td>
                 <td>{{Lesson.duration}}</td>
