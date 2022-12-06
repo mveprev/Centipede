@@ -1,4 +1,4 @@
-# Team *<enter team name here>* Small Group project
+# Team *<Centipede>* Small Group project
 
 ## Team members
 The members of the team are:
@@ -12,7 +12,7 @@ The members of the team are:
 The project is called `msms` (Music School Management System).  It currently consists of a single app `lessons` where all functionality resides.
 
 ## Deployed version of the application
-The deployed version of the application can be found at *<[enter URL here](URL)>*.
+The deployed version of the application can be found at *<[http://guyvandijken.pythonanywhere.com/](URL)>*.
 
 ## Installation instructions
 To install the software and use it in your local development environment, you must first set up and activate a local development environment.  From the root of the project:
@@ -50,4 +50,8 @@ $ python3 manage.py test
 ## Sources
 The packages used by this application are specified in `requirements.txt`
 
-*Declare are other sources here.*
+utils.py Line0 -> Line36  and views.py Line489 -> Line532 
+These code implement the Calendar function for Teacher Timetable
+reference link: 
+*<[https://www.huiwenteo.com/normal/2018/07/24/django-calendar.html](URL)>* 
+*<[https://www.huiwenteo.com/normal/2018/07/29/django-calendar-ii.html](URL)>*
