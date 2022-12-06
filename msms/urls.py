@@ -41,6 +41,7 @@ urlpatterns = [
     path('delete_terms/<term_id>', views.delete_term_dates, name='delete_term_dates'),
     path('edit_booking/<lessonId>', views.edit_booking, name='edit-booking'),
     path('delete_booking/<lessonId>', views.delete_booking, name='delete-booking'),
+    path('reject_booking/<lessonId>', views.reject_booking, name='reject-booking'),
     path('invoices/<lessonId>', views.invoice_generator, name='invoices'),
     path('student_timetable/<lessonId>', views.lesson_detail_generator, name='student_timetable'),
     path('renew_lesson/<lessonId>', views.renew_lesson, name='renew_lesson'),

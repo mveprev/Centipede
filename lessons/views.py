@@ -222,7 +222,7 @@ def admin_landing_page(request):
 
 
 def admin_lessons(request):
-    lessonsList = Lesson.objects.all()
+    lessonsList = Lesson.objects.all().order_by('is_confirmed', '-id')
     return render(request, 'admin_lessons.html', {'admin_lessons': lessonsList})
 
 
@@ -333,11 +333,21 @@ def delete_booking(request, lessonId):
     return render(request, 'admin_lessons.html', {'admin_lessons': lessonsList})
 
 
+'''For admin user: reject the request'''
+
+
+def reject_booking(request, lessonId):
+    lesson = Lesson.objects.get(id=lessonId)
+    lesson.delete()
+    lessonsList = Lesson.objects.all()
+    return render(request, 'admin_lessons.html', {'admin_lessons': lessonsList})
+
+
 '''For admin user: render the payment page with a list of payment'''
 
 
 def admin_payment(request):
-    studentList = User.objects.filter(is_teacher=False, is_staff=False, is_superuser=False)
+    studentList = User.objects.filter(is_teacher=False, is_staff=False, is_superuser=False).order_by('first_name')
     return render(request, 'admin_payment.html', {'admin_payment': studentList})
 
 

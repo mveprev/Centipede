@@ -4,6 +4,10 @@
   <div class='row'>
     <div class='col-10 offset-1'>
       <h1>Student Lessons Information</h1>
+      <strong>*If you want to edit or delete the lesson after the lessons has been booked</strong>
+      <div></div>
+      <strong>Please contact the school administrator by eamil: petra.pickles@example.org</strong>
+      <p></p>
       <!--Makes the table that will display lessons.-->
       <table class="table">
         <thead>
@@ -35,19 +39,14 @@
                 <!--Checks if the lesson is confirmed. Disables the button if it is.-->
                 {% if Lesson.is_confirmed %}
                   <td>Yes</td>
-                  <th scope="col"><button type="button" class="btn btn-primary btn-sm" disabled>Edit</button></th>
-                  <th scope="col"><button type="button" class="btn btn-secondary btn-sm" disabled>Delete</button></th>
                   <th scope="col"><a class="btn btn-secondary btn-sm" href="{% url 'invoices' Lesson.id %}" role="button">Invoice</a></th>
-                  <th scope="col"><a class="btn btn-secondary btn-sm" href="{% url 'student_timetable' Lesson.id %}" role="button">Lesson Information</a></th>
                   <th scope="col"><a class="btn btn-secondary btn-sm" href="{% url 'renew_lesson' Lesson.id %}" role="button">Renew</a></th>
-                {% else %}
+                  <th scope="col"><a class="btn btn-secondary btn-sm" href="{% url 'student_timetable' Lesson.id %}" role="button">Lesson Information</a></th>
+                  {% else %}
                 <!--Delete, edit and renew button-->
                   <td>No</td>
                   <th scope="col"><a class="btn btn-primary btn-sm" href="{% url 'edit-lesson' Lesson.id %}" role="button">Edit</a></th>
                   <th scope="col"><a class="btn btn-secondary btn-sm" href="{% url 'delete-lesson' Lesson.id %}" role="button">Delete</a></th>
-                  <th scope="col"><button type="button" class="btn btn-secondary btn-sm" disabled>Invoice</button></th>
-                  <th scope="col"><button type="button" class="btn btn-secondary btn-sm" disabled>Lesson Information</button> </th>
-                  <th scope="col"><button type="button" class="btn btn-secondary btn-sm" disabled>Renew</button></th>
                 {% endif %}
               </tr>
             {% endfor%}

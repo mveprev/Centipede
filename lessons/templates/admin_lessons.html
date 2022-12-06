@@ -2,13 +2,14 @@
 {% block admin_content %}
 <div class='container'>
     <div class='row'>
-      <div class='col-9 offset-2'>
+      <div class='col-10 offset-1'>
             <h1>Students Request Management</h1>
             <!--Makes the table that will display lessons.-->
             <table class="table">
               <thead>
                 <tr>
                   <th scope="col">Name</th>
+                  <th scope="col">Term</th>
                   <th scope="col">Lessons</th>
                   <th scope="col">Interval</th>
                   <th scope="col">Duration</th>
@@ -27,6 +28,7 @@
                       {% else %}
                         <td>{{Lesson.user.first_name}} {{' '}} {{Lesson.user.last_name}}</td>
                       {% endif %}
+                      <td>{{Lesson.term.name}}</td>
                       <td>{{Lesson.lessons}}</td>
                       <td>{{Lesson.desiredInterval}}</td>
                       <td>{{Lesson.duration}}</td>
@@ -50,6 +52,10 @@
                         <a class="btn btn-secondary btn-sm"
                         href="{% url 'book-lesson' Lesson.id %}"
                         role="button">Book</a>
+                      <th scope="col">
+                        <a class="btn btn-secondary btn-sm"
+                        href="{% url 'reject-booking' Lesson.id %}"
+                        role="button">Reject</a>
                       {% endif %}
                     </tr>
                   {% endfor%}
