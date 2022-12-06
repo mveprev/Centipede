@@ -1,4 +1,4 @@
-# Team *<Centipede>* Small Group project
+# Team *Centipede* Small Group project
 
 ## Team members
 The members of the team are:
@@ -50,6 +50,6 @@ $ python3 manage.py test
 ## Sources
 The packages used by this application are specified in `requirements.txt`
 
-utils.py from Line0 to Line36 and views.py from Line489 to Line532 implement the Calendar function for Teacher Timetable. reference link: 
+utils.py from Line0 to Line36 and views.py from Line489 to Line532 implement the Calendar function for Teacher Timetable. Reference link: 
 - *<[https://www.huiwenteo.com/normal/2018/07/24/django-calendar.html](URL)>* 
 - *<[https://www.huiwenteo.com/normal/2018/07/29/django-calendar-ii.html](URL)>*
