@@ -8,7 +8,7 @@ from .helpers import LogInTester
 class LogInViewTestCase(TestCase, LogInTester):
 
     def setUp(self):
-        self.url = reverse('log_in')
+        self.url = reverse('home')
         self.user = User.objects.create_user(
             email = 'james@example.org',
             first_name='James',
@@ -17,12 +17,12 @@ class LogInViewTestCase(TestCase, LogInTester):
         )
 
     def test_log_in_url(self):
-        self.assertEqual(self.url, '/log_in/')
+        self.assertEqual(self.url, '/')
 
     def test_get_log_in(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'log_in.html')
+        self.assertTemplateUsed(response, 'home.html')
         form = response.context['form']
         self.assertTrue(isinstance(form, LogInForm))
         self.assertFalse(form.is_bound)
@@ -33,7 +33,7 @@ class LogInViewTestCase(TestCase, LogInTester):
         form_input = {'email':'james@example.org', 'password':'WrongPassword123'}
         response = self.client.post(self.url, form_input)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'log_in.html')
+        self.assertTemplateUsed(response, 'home.html')
         form = response.context['form']
         self.assertTrue(isinstance(form, LogInForm))
         self.assertFalse(form.is_bound)
@@ -58,7 +58,7 @@ class LogInViewTestCase(TestCase, LogInTester):
         form_input = {'email':'james@example.org', 'password':'Lu123'}
         response = self.client.post(self.url, form_input, follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'log_in.html')
+        self.assertTemplateUsed(response, 'home.html')
         form = response.context['form']
         self.assertTrue(isinstance(form, LogInForm))
         self.assertFalse(form.is_bound)
