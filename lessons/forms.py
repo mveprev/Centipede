@@ -258,7 +258,7 @@ class ScheduleForm(forms.ModelForm):
 
     teacher = CustomScheduleForm(
         queryset=User.objects.filter(is_teacher=True),
-        empty_label='------------ Please select teacher ------------',
+        empty_label='------------------------ Please select teacher ------------------------',
         required=True,
         widget=forms.Select,
         label=mark_safe("<strong>Select Teacher</strong>")

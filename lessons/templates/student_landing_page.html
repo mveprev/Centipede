@@ -4,7 +4,7 @@
 {% load crispy_forms_tags %}
 <div class='container'>
     <div class='row'>
-        <div class='col-md-7 col-md-6 offset-md-2'>
+        <div class='col-7 offset-md-2'>
             <h1>Student Lessons Booking</h1>
             <form action = "{% url 'student_landing_page' %}" method="POST">
                 {% csrf_token %}
