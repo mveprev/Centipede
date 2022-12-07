@@ -44,7 +44,7 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
     """User model used for authentication"""
-    
+
     email = models.EmailField(
         unique=True,
         max_length=50,

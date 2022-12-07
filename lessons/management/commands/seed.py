@@ -571,7 +571,7 @@ class Command(BaseCommand):
                 last_name=last_name,
             )
 
-            Lesson.objects.create(
+            userLesson = Lesson.objects.create(
                 term=termGenerator(self, self.faker.lesson_terms()),
 
                 mondayMorning=timeGenerator(self, self.faker.time_number()),
@@ -602,7 +602,12 @@ class Command(BaseCommand):
                 studentNum=(str(newUser.pk)[:4]).zfill(4),
                 invoiceEmail=newUser.email,
             )
-
+            currentTerm = userLesson.term
+            interval = userLesson.desiredInterval
+            term_length = (currentTerm.end_date - currentTerm.start_date).days
+            while (userLesson.lessons-1) * interval > term_length:
+                userLesson.lessons -=1
+                userLesson.save()
             # Creation of seeded users with confirmed lessons and payments.
 
         for _ in range(0, 50):
@@ -650,6 +655,13 @@ class Command(BaseCommand):
                 studentNum=(str(newUser.pk)[:4]).zfill(4),
                 invoiceEmail=newUser.email,
             )
+
+            currentTerm = userLesson.term
+            interval = userLesson.desiredInterval
+            term_length = (currentTerm.end_date - currentTerm.start_date).days
+            while (userLesson.lessons-1) * interval > term_length:
+                userLesson.lessons -=1
+                userLesson.save()
 
             now = datetime.datetime.now()
             startDate = datetime.date(2022, 12, self.faker.lesson_dates())
