@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -156,14 +157,18 @@ def edit_lesson(request, lessonId):
 
 @user_passes_test(student_test, login_url='log_out')
 def delete_lesson(request, lessonId):
-    lesson = Lesson.objects.get(id=lessonId)
-    lesson.delete()
-    if request.user.is_authenticated:
+    try:
+        if(lessonId is not None):
+            lesson = Lesson.objects.get(id=lessonId)
+            lesson.delete()
+        if request.user.is_authenticated:
+            lessonsList = createLessonList(request.user)
+            return render(request, 'student_lessons.html', {'student_lessons': lessonsList})
+        else:
+            return render(request, 'home.html')
+    except:
         lessonsList = createLessonList(request.user)
         return render(request, 'student_lessons.html', {'student_lessons': lessonsList})
-    else:
-        return render(request, 'home.html')
-
 
 '''For student user: renew the lesson for next term'''
 
@@ -215,15 +220,17 @@ def my_children(request):
 
 @user_passes_test(student_test, login_url='log_out')
 def delete_children(request, childrenId):
-    child = Children.objects.get(id=childrenId)
-    child.delete()
-    if request.user.is_authenticated:
+    if not request.user.is_authenticated:
+        return render(request, 'home.html')
+    else:
+        try:
+            child = Children.objects.get(id=childrenId)
+            child.delete()
+        except:
+            print("Tried to delete an object that does not exist.")
         currentUser = request.user
         childrenList = Children.objects.filter(parent=currentUser)
         return render(request, 'my_children.html', {'my_children': childrenList})
-    else:
-        return render(request, 'home.html')
-
 
 '''For admin user: render the landing page'''
 
@@ -349,31 +356,36 @@ def edit_booking(request, lessonId):
 
 @user_passes_test(admin_test, login_url='log_out')
 def delete_booking(request, lessonId):
-    lesson = Lesson.objects.get(id=lessonId)
-    schedules = Schedule.objects.filter(lesson=lesson)
-    schedule = schedules.first()
-    if lesson.duration == 30:
-        lessonCost = 30
-    elif lesson.duration == 45:
-        lessonCost = 45
-    elif lesson.duration == 60:
-        lessonCost = 60
-    totalCost = lessonCost*schedule.number_of_lessons
-    user = lesson.user
-    user.outstanding_balance += totalCost
-    user.save()
-    lesson.delete()
-    schedules.delete()
+    try:
+        lesson = Lesson.objects.get(id=lessonId)
+        schedules = Schedule.objects.filter(lesson=lesson)
+        schedule = schedules.first()
+        if lesson.duration == 30:
+            lessonCost = 30
+        elif lesson.duration == 45:
+            lessonCost = 45
+        elif lesson.duration == 60:
+            lessonCost = 60
+        totalCost = lessonCost*schedule.number_of_lessons
+        user = lesson.user
+        user.outstanding_balance += totalCost
+        user.save()
+        lesson.delete()
+        schedules.delete()
+    except:
+        print("Tried to delete an object that does not exist.")
     lessonsList = Lesson.objects.all()
     return render(request, 'admin_lessons.html', {'admin_lessons': lessonsList})
-
 
 '''For admin user: reject the request'''
 
 @user_passes_test(admin_test, login_url='log_out')
 def reject_booking(request, lessonId):
-    lesson = Lesson.objects.get(id=lessonId)
-    lesson.delete()
+    try:
+        lesson = Lesson.objects.get(id=lessonId)
+        lesson.delete()
+    except:
+        print("Tried to delete an object that does not exist.")
     lessonsList = Lesson.objects.all()
     return render(request, 'admin_lessons.html', {'admin_lessons': lessonsList})
 
@@ -426,8 +438,11 @@ def edit_term_dates(request, term_id):
 
 @user_passes_test(admin_test, login_url='log_out')
 def delete_term_dates(request, term_id):
-    term = TermDates.objects.get(pk=term_id)
-    term.delete()
+    try:
+        term = TermDates.objects.get(pk=term_id)
+        term.delete()
+    except:
+        print("Tried to delete an object that does not exist.")
     terms = TermDates.objects.all()
     return render(request, 'view_term_dates.html', {"term_dates": terms})
 
