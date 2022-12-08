@@ -1,6 +1,6 @@
 """Forms for the Lessons app."""
 from django.core.validators import validate_email
-from django.core.validators import RegexValidator, MinValueValidator
+from django.core.validators import RegexValidator
 from django import forms
 from lessons.models import User, Children, TermDates, Schedule, Payment
 from django.utils.safestring import mark_safe
@@ -86,8 +86,10 @@ class LessonForm(forms.ModelForm):
         number_of_lessons = self.cleaned_data.get('lessons')
         interval = self.cleaned_data.get('desiredInterval')
         term_length = (currentTerm.end_date - currentTerm.start_date).days
+        if number_of_lessons < 1:
+            self.add_error('lessons', 'Number of lessons must be a positive integer.')
         if (number_of_lessons-1) * interval > term_length:
-            self.add_error('lessons', 'Too much lessons, this term is not long enough')
+            self.add_error('lessons', 'Too many lessons, this term is not long enough')
         if datetime.now().date()>currentTerm.end_date:
             self.add_error('term', 'This term has ended')
 
@@ -150,8 +152,7 @@ class LessonForm(forms.ModelForm):
     fridayAfternoon=forms.BooleanField(required=False,label=mark_safe("<strong> &nbsp &nbsp &nbsp Afternoon (13:00 - 17:00)</strong>"))
     fridayNight=forms.BooleanField(required=False,label=mark_safe("<strong> &nbsp &nbsp &nbsp Night (18:00 - 22:00)</strong>"))
 
-    lessons= forms.IntegerField(validators=[MinValueValidator(limit_value=1, message = "Number of lessons must be a positive integer.")],
-                                            label=mark_safe("<strong>Enter the number of lessons</strong>"))
+    lessons= forms.IntegerField(label=mark_safe("<strong>Enter the number of lessons</strong>"))
     desiredInterval=forms.IntegerField(label=mark_safe("<strong>Enter desired interval between lessons</strong>"),
     widget=forms.Select(choices=INTERVAL_CHOICES))
     duration=forms.IntegerField(label=mark_safe("<strong>Enter duration of the lesson</strong>"),
@@ -161,6 +162,12 @@ class LessonForm(forms.ModelForm):
 
 class ChildrenForm(forms.ModelForm):
     """Form to ask user for fill in details of the child"""
+
+    def clean(self):
+        super().clean()
+        age = self.cleaned_data.get('age')
+        if age < 1:
+            self.add_error('age', 'Age must be a positive integer.')
 
     class Meta:
         """Form options."""
@@ -177,7 +184,7 @@ class DatePickerInput(forms.DateInput):
     input_type = 'date'
 
 class TimePickerInput(forms.TimeInput):
-        input_type = 'time'
+    input_type = 'time'
 
 class DateForm(forms.ModelForm):
     """Form to ask user for fill in a lesson."""
@@ -232,6 +239,8 @@ class ScheduleForm(forms.ModelForm):
         duration = self.cleaned_data.get('duration')
         interval = self.cleaned_data.get('interval')
         number_of_lessons = self.cleaned_data.get('number_of_lessons')
+        if number_of_lessons < 1:
+            self.add_error('number_of_lessons', 'Number of lessons must be a positive integer.')
         schedules = Schedule.objects.filter(teacher = currentTeacher)
         list_of_date = []
         for x in range(0,number_of_lessons):
@@ -272,8 +281,7 @@ class ScheduleForm(forms.ModelForm):
     )
     start_time = forms.TimeField(label=mark_safe("<strong>Enter the start time</strong>"),widget=TimePickerInput)
     start_date = forms.DateField(label=mark_safe("<strong>Enter the start date</strong>"),widget=DatePickerInput)
-    number_of_lessons = forms.IntegerField(validators=[MinValueValidator(limit_value=1, message = "Number of lessons must be a positive integer.")],
-                                                        label=mark_safe("<strong>Enter the number of lessons</strong>"))
+    number_of_lessons = forms.IntegerField(label=mark_safe("<strong>Enter the number of lessons</strong>"))
     interval = forms.IntegerField(label=mark_safe("<strong>Enter interval between lessons</strong>"),widget=forms.Select(choices=INTERVAL_CHOICES))
     duration = forms.IntegerField(label=mark_safe("<strong>Enter duration of the lesson</strong>"),widget=forms.Select(choices=DURATION_CHOICES))
 
@@ -282,10 +290,15 @@ class ScheduleForm(forms.ModelForm):
 class PaymentForm(forms.ModelForm):
     """Form to ask user to enter the amount paid."""
 
+    def clean(self):
+        super().clean()
+        amount_paid = self.cleaned_data.get('amount_paid')
+        if amount_paid < 1:
+            self.add_error('amount_paid', 'Amount paid must be a positive integer.')
+
     class Meta:
         """Form options."""
 
         model = Payment
         fields = ('amount_paid',)
-    amount_paid = forms.IntegerField(validators=[MinValueValidator(limit_value=1, message = "Amount paid must be a positive integer.")],
-                                    label=mark_safe("<strong>Enter the amount paid</strong>"))
+    amount_paid = forms.IntegerField(label=mark_safe("<strong>Enter the amount paid</strong>"))
