@@ -12,12 +12,12 @@ class TestViews(TestCase):
         user.set_password(self.password)
         user.save()        
         
-    def test_student_lessons_not_logged_in(self):
-        response = self.client.get(reverse('student_lessons'))
+    def test_student_payment_not_logged_in(self):
+        response = self.client.get(reverse('student_payment'))
         self.assertEquals(response.status_code, 302)
                 
     def test_student_lessons_when_logged_in(self):
         self.client.login(email=self.email, password=self.password)
-        response = self.client.get(reverse('student_lessons'))
+        response = self.client.get(reverse('student_payment'))
         self.assertEquals(response.status_code, 200)
-        self.assertTemplateUsed(response, 'student_lessons.html')
+        self.assertTemplateUsed(response, 'student_payment.html')
