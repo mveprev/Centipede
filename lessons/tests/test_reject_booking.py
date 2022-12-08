@@ -9,11 +9,10 @@ class TestViews(TestCase):
         self.client = Client()
         self.email = 'dummy@example.com'
         self.password = 'Password123'
-        self.admin = True
         user = User.objects.create(email=self.email)
         user.set_password(self.password)
-        user.save()
         user.is_staff = True
+        user.save()
         self.client.login(email=self.email, password=self.password)
 
         term = TermDates.objects.create(name = 'test', start_date='2022-01-01', end_date='2022-12-31')

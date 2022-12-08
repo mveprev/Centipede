@@ -1,5 +1,6 @@
 from django.test import TestCase, Client
 from django.urls import reverse
+from lessons.models import User
 
 #Test for admin_landing_page in views.py
 class TestViews(TestCase):
@@ -16,22 +17,22 @@ class TestViews(TestCase):
 
 
     def test_admin_landing_page(self):
-        response = client.get(reverse('admin_landing_page'))
+        response = self.client.get(reverse('admin_landing_page'))
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'admin_landing_page.html')
 
 
     def test_admin_lesson_page(self):
-        response = client.get(reverse('admin_lessons'))
+        response = self.client.get(reverse('admin_lessons'))
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'admin_lessons.html')
 
     def test_admin_payment(self):
-        response = client.get(reverse('admin_payment'))
+        response = self.client.get(reverse('admin_payment'))
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'admin_payment.html')
 
     def test_view_term_dates(self):
-        response = client.get(reverse('view_term_dates'))
+        response = self.client.get(reverse('view_term_dates'))
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'view_term_dates.html')
