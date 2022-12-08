@@ -150,7 +150,8 @@ class LessonForm(forms.ModelForm):
     fridayAfternoon=forms.BooleanField(required=False,label=mark_safe("<strong> &nbsp &nbsp &nbsp Afternoon (13:00 - 17:00)</strong>"))
     fridayNight=forms.BooleanField(required=False,label=mark_safe("<strong> &nbsp &nbsp &nbsp Night (18:00 - 22:00)</strong>"))
 
-    lessons= forms.IntegerField(label=mark_safe("<strong>Enter the number of lessons</strong>"))
+    lessons= forms.IntegerField(validators=[MinValueValidator(limit_value=1, message = "Number of lessons must be a positive integer.")],
+                                            label=mark_safe("<strong>Enter the number of lessons</strong>"))
     desiredInterval=forms.IntegerField(label=mark_safe("<strong>Enter desired interval between lessons</strong>"),
     widget=forms.Select(choices=INTERVAL_CHOICES))
     duration=forms.IntegerField(label=mark_safe("<strong>Enter duration of the lesson</strong>"),
@@ -219,7 +220,7 @@ def time_plus(time, timedelta):
         hour=time.hour, minute=time.minute, second=time.second)
     end = start + timedelta
     return end.time()
-        
+
 class ScheduleForm(forms.ModelForm):
     """Form to ask user for fill in a schedule."""
 
@@ -244,7 +245,7 @@ class ScheduleForm(forms.ModelForm):
 
     class Meta:
         """Form options."""
-        
+
         model = Schedule
         fields = ('teacher','start_time','start_date','interval','number_of_lessons','duration')
 
@@ -271,7 +272,8 @@ class ScheduleForm(forms.ModelForm):
     )
     start_time = forms.TimeField(label=mark_safe("<strong>Enter the start time</strong>"),widget=TimePickerInput)
     start_date = forms.DateField(label=mark_safe("<strong>Enter the start date</strong>"),widget=DatePickerInput)
-    number_of_lessons = forms.IntegerField(label=mark_safe("<strong>Enter the number of lessons</strong>"))
+    number_of_lessons = forms.IntegerField(validators=[MinValueValidator(limit_value=1, message = "Number of lessons must be a positive integer.")],
+                                                        label=mark_safe("<strong>Enter the number of lessons</strong>"))
     interval = forms.IntegerField(label=mark_safe("<strong>Enter interval between lessons</strong>"),widget=forms.Select(choices=INTERVAL_CHOICES))
     duration = forms.IntegerField(label=mark_safe("<strong>Enter duration of the lesson</strong>"),widget=forms.Select(choices=DURATION_CHOICES))
 

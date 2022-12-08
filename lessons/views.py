@@ -2,6 +2,8 @@ from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.mixins import UserPassesTestMixin
 from django.shortcuts import redirect, render
 from django.db.models import Prefetch
 from django.http import HttpResponse
@@ -83,9 +85,16 @@ def createLessonList(currentUser):
         children__in=asChild) | Lesson.objects.filter(children__in=allChildren) | Lesson.objects.filter(user__in=childUser)
     return lessonsList
 
+
+def student_test(user):
+    return user.is_anonymous==False and user.is_teacher==False and user.is_staff==False and user.is_superuser==False
+
+def admin_test(user):
+    return user.is_anonymous==False and user.is_staff
+
 '''For student user: render the landing page'''
 
-
+@user_passes_test(student_test, login_url='log_out')
 def student_landing_page(request):
     return render(request, 'student_landing_page.html')
 
@@ -108,7 +117,7 @@ def student_booking(request):
 
 '''For student user: show a list of lessons'''
 
-
+@user_passes_test(student_test, login_url='log_out')
 def student_lessons(request):
     if request.user.is_authenticated:
         lessonsList = createLessonList(request.user)
@@ -119,7 +128,7 @@ def student_lessons(request):
 
 '''For student user: show the balance of user and a list of payment'''
 
-
+@user_passes_test(student_test, login_url='log_out')
 def student_payment(request):
     if request.user.is_authenticated:
         currentUser = request.user
@@ -131,7 +140,7 @@ def student_payment(request):
 
 '''For student user: edit the lesson with the form'''
 
-
+@user_passes_test(student_test, login_url='log_out')
 def edit_lesson(request, lessonId):
     lesson = Lesson.objects.get(id=lessonId)
     form = LessonForm(data=request.POST or None, request=request, instance=lesson)
@@ -146,7 +155,7 @@ def edit_lesson(request, lessonId):
 
 '''For student user: delete the lesson'''
 
-
+@user_passes_test(student_test, login_url='log_out')
 def delete_lesson(request, lessonId):
     try:
         if(lessonId is not None):
@@ -163,7 +172,7 @@ def delete_lesson(request, lessonId):
 
 '''For student user: renew the lesson for next term'''
 
-
+@user_passes_test(student_test, login_url='log_out')
 def renew_lesson(request, lessonId):
     lesson = Lesson.objects.get(id=lessonId)
     terms = TermDates.objects.all()
@@ -181,7 +190,7 @@ def renew_lesson(request, lessonId):
 
 '''For student user: add children with a form'''
 
-
+@user_passes_test(student_test, login_url='log_out')
 def add_children(request):
     if request.method == "POST":
         form = ChildrenForm(request.POST)
@@ -197,7 +206,7 @@ def add_children(request):
 
 '''For student user: show a list of their children'''
 
-
+@user_passes_test(student_test, login_url='log_out')
 def my_children(request):
     if request.user.is_authenticated:
         currentUser = request.user
@@ -209,7 +218,7 @@ def my_children(request):
 
 '''For student user: delete their children'''
 
-
+@user_passes_test(student_test, login_url='log_out')
 def delete_children(request, childrenId):
     if not request.user.is_authenticated:
         return render(request, 'home.html')
@@ -225,14 +234,14 @@ def delete_children(request, childrenId):
 
 '''For admin user: render the landing page'''
 
-
+@user_passes_test(admin_test, login_url='log_out')
 def admin_landing_page(request):
     return render(request, 'admin_landing_page.html')
 
 
 '''For admin user: render the lesson page with a list of all lessons'''
 
-
+@user_passes_test(admin_test, login_url='log_out')
 def admin_lessons(request):
     lessonsList = Lesson.objects.all().order_by('is_confirmed', '-id')
     return render(request, 'admin_lessons.html', {'admin_lessons': lessonsList})
@@ -240,7 +249,7 @@ def admin_lessons(request):
 
 '''For admin user: fulfil the lesson request with a form'''
 
-
+@user_passes_test(admin_test, login_url='log_out')
 def book_lesson(request, lessonId):
     lesson = Lesson.objects.get(id=lessonId)
     form = ScheduleForm(data=request.POST or None)
@@ -270,7 +279,12 @@ def book_lesson(request, lessonId):
             lesson.desiredInterval = 'Once a month'
         lesson.save()
         user = lesson.user
-        lessonCost = 20
+        if lesson.duration == 30:
+            lessonCost = 30
+        elif lesson.duration == 45:
+            lessonCost = 45
+        elif lesson.duration == 60:
+            lessonCost = 60
         totalCost = lessonCost*schedule.number_of_lessons
         user.outstanding_balance -= totalCost
         user.save()
@@ -281,12 +295,17 @@ def book_lesson(request, lessonId):
 
 '''For admin user: edit the booked lessons with a form'''
 
-
+@user_passes_test(admin_test, login_url='log_out')
 def edit_booking(request, lessonId):
     lesson = Lesson.objects.get(id=lessonId)
     schedules = Schedule.objects.filter(lesson=lesson)
     schedule = schedules.first()
-    lessonCost = 20
+    if lesson.duration == 30:
+        lessonCost = 30
+    elif lesson.duration == 45:
+        lessonCost = 45
+    elif lesson.duration == 60:
+        lessonCost = 60
     initialLessons = schedule.number_of_lessons
     initialCost = lessonCost*initialLessons
     form = ScheduleForm(data=request.POST or None, instance=schedule)
@@ -302,6 +321,12 @@ def edit_booking(request, lessonId):
         elif schedule.interval == '30':
             lesson.desiredInterval = 'Once a month'
         lesson.save()
+        if lesson.duration == 30:
+            lessonCost = 30
+        elif lesson.duration == 45:
+            lessonCost = 45
+        elif lesson.duration == 60:
+            lessonCost = 60
         newLessons = schedule.number_of_lessons
         user = lesson.user
         if newLessons < initialLessons:
@@ -329,13 +354,18 @@ def edit_booking(request, lessonId):
 
 '''For admin user: delete the booked lessons'''
 
-
+@user_passes_test(admin_test, login_url='log_out')
 def delete_booking(request, lessonId):
     try:
         lesson = Lesson.objects.get(id=lessonId)
         schedules = Schedule.objects.filter(lesson=lesson)
         schedule = schedules.first()
-        lessonCost = 20
+        if lesson.duration == 30:
+            lessonCost = 30
+        elif lesson.duration == 45:
+            lessonCost = 45
+        elif lesson.duration == 60:
+            lessonCost = 60
         totalCost = lessonCost*schedule.number_of_lessons
         user = lesson.user
         user.outstanding_balance += totalCost
@@ -349,7 +379,7 @@ def delete_booking(request, lessonId):
 
 '''For admin user: reject the request'''
 
-
+@user_passes_test(admin_test, login_url='log_out')
 def reject_booking(request, lessonId):
     try:
         lesson = Lesson.objects.get(id=lessonId)
@@ -362,7 +392,7 @@ def reject_booking(request, lessonId):
 
 '''For admin user: render the payment page with a list of payment'''
 
-
+@user_passes_test(admin_test, login_url='log_out')
 def admin_payment(request):
     studentList = User.objects.filter(is_teacher=False, is_staff=False, is_superuser=False).order_by('first_name')
     return render(request, 'admin_payment.html', {'admin_payment': studentList})
@@ -370,7 +400,7 @@ def admin_payment(request):
 
 '''For admin user: add term date with a form'''
 
-
+@user_passes_test(admin_test, login_url='log_out')
 def term_dates(request):
     form = DateForm(request.POST)
     if request.method == "POST":
@@ -383,7 +413,7 @@ def term_dates(request):
 
 '''For admin user: render the term date page with a list of terms'''
 
-
+@user_passes_test(admin_test, login_url='log_out')
 def view_term_dates(request):
     terms = TermDates.objects.all()
     return render(request, 'view_term_dates.html', {"term_dates": terms})
@@ -391,7 +421,7 @@ def view_term_dates(request):
 
 '''For admin user: edit the term date with a form'''
 
-
+@user_passes_test(admin_test, login_url='log_out')
 def edit_term_dates(request, term_id):
     term = TermDates.objects.get(pk=term_id)
     form = DateForm(data=request.POST or None, instance=term)
@@ -406,7 +436,7 @@ def edit_term_dates(request, term_id):
 
 '''For admin user: delete the term dates'''
 
-
+@user_passes_test(admin_test, login_url='log_out')
 def delete_term_dates(request, term_id):
     try:
         term = TermDates.objects.get(pk=term_id)
@@ -419,7 +449,7 @@ def delete_term_dates(request, term_id):
 
 '''For admin user: make payment for student with a form'''
 
-
+@user_passes_test(admin_test, login_url='log_out')
 def make_payment(request, userId):
     student = User.objects.get(id=userId)
     form = PaymentForm(data=request.POST or None)
@@ -442,7 +472,7 @@ def make_payment(request, userId):
 
 '''For student user: generate the invoice PDF'''
 
-
+@user_passes_test(student_test, login_url='log_out')
 def invoice_generator(request, lessonId):
     currentUser = request.user
     currentLesson = Lesson.objects.get(id=lessonId)
@@ -486,7 +516,7 @@ def invoice_generator(request, lessonId):
 
 '''For student user: generate the booked lesson detail PDF'''
 
-
+@user_passes_test(student_test, login_url='log_out')
 def lesson_detail_generator(request, lessonId):
     currentLesson = Lesson.objects.get(id=lessonId)
     schedules = Schedule.objects.filter(lesson=currentLesson)
@@ -506,9 +536,15 @@ def lesson_detail_generator(request, lessonId):
 '''Render the calendar'''
 
 
-class CalendarView(generic.ListView):
+class CalendarView(UserPassesTestMixin, generic.ListView):
     model = Schedule
     template_name = 'teacher_landing_page.html'
+
+    def test_func(self):
+        return self.request.user.is_anonymous==False and self.request.user.is_teacher
+
+    def handle_no_permission(self):
+        return redirect('log_out')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
