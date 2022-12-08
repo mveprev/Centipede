@@ -13,12 +13,18 @@ class TestViews(TestCase):
         user.set_password(self.password)
         user.save()
         self.client.login(email=self.email, password=self.password)
-        
+
         child = Children.objects.create(first_name='test',last_name='test',age=5,parent_id = 1)
         child.save()
-        
+
     def test_delete_child(self):
         response = self.client.get(reverse('delete-children', args=[1]))
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'my_children.html')
         self.assertEqual(Children.objects.count(), 0)
+
+    def test_delete_child_without_child_id(self):
+        response = self.client.get(reverse('delete-children', args=[None]))
+        self.assertEquals(response.status_code, 200)
+        self.assertTemplateUsed(response, 'my_children.html')
+        self.assertEqual(Children.objects.count(), 1)

@@ -24,3 +24,9 @@ class TestViews(TestCase):
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'view_term_dates.html')
         self.assertEqual(TermDates.objects.count(), 0)
+
+    def test_delete_term_without_term_id(self):
+        response = self.client.get(reverse('delete_term_dates', args=[None]))
+        self.assertEquals(response.status_code, 200)
+        self.assertTemplateUsed(response, 'view_term_dates.html')
+        self.assertEqual(TermDates.objects.count(), 1)

@@ -57,3 +57,9 @@ class TestViews(TestCase):
         'end_date':'2022-12-31'
         })
         self.assertEquals(response.status_code, 200)
+
+    def test_successful_edit_term_dates(self):
+        before_count = TermDates.objects.count()
+        response = self.client.post(reverse('edit_term_dates', args=[1]), self.form_input, follow=True)
+        after_count = TermDates.objects.count()
+        self.assertEqual(after_count, before_count)
