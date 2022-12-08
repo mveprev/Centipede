@@ -26,3 +26,9 @@ class TestViews(TestCase):
         self.assertEquals(response.status_code, 200)
         self.assertEqual(Lesson.objects.count(), 0)
         self.assertTemplateUsed(response, 'admin_lessons.html')
+
+    def test_reject_booking_without_lesson_id(self):
+        response = self.client.get(reverse('reject-booking', args=[None]))
+        self.assertEquals(response.status_code, 200)
+        self.assertEqual(Lesson.objects.count(), 1)
+        self.assertTemplateUsed(response, 'admin_lessons.html')

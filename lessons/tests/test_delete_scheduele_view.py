@@ -39,3 +39,33 @@ class TestViews(TestCase):
         self.assertEqual(Lesson.objects.count(), 0)
         self.assertEqual(Schedule.objects.count(), 0)
         self.assertTemplateUsed(response, 'admin_lessons.html')
+
+    def test_delete_second_schedule(self):
+        second_lesson = Lesson.objects.create(term=TermDates.objects.first(), lessons = 1, desiredInterval = 7, duration = 45, id = 2, user_id = 1, children = None)
+        second_booking = Schedule.objects.create(teacher = self.teacher, lesson=second_lesson, start_time=time(23,12,00), start_date=date(2022,6,1), interval=7,number_of_lessons=7,duration=45)
+        second_booking.save()
+        response = self.client.get(reverse('delete-booking', args=[2]))
+        self.assertEquals(response.status_code, 200)
+        self.assertEqual(Lesson.objects.count(), 1)
+        self.assertEqual(Schedule.objects.count(), 1)
+        self.assertTemplateUsed(response, 'admin_lessons.html')
+
+    def test_delete_third_schedule(self):
+        third_lesson = Lesson.objects.create(term=TermDates.objects.first(), lessons = 1, desiredInterval = 7, duration = 60, id = 3, user_id = 1, children = None)
+        third_booking = Schedule.objects.create(teacher = self.teacher, lesson=third_lesson, start_time=time(23,12,00), start_date=date(2022,6,1), interval=7,number_of_lessons=7,duration=60)
+        third_booking.save()
+        response = self.client.get(reverse('delete-booking', args=[3]))
+        self.assertEquals(response.status_code, 200)
+        self.assertEqual(Lesson.objects.count(), 1)
+        self.assertEqual(Schedule.objects.count(), 1)
+        self.assertTemplateUsed(response, 'admin_lessons.html')
+
+    def test_delete_schedule_without_lesson_id(self):
+        fourth_lesson = Lesson.objects.create(term=TermDates.objects.first(), lessons = 1, desiredInterval = 7, duration = 60, id = 4, user_id = 1, children = None)
+        fourth_booking = Schedule.objects.create(teacher = self.teacher, lesson=fourth_lesson, start_time=time(23,12,00), start_date=date(2022,6,1), interval=7,number_of_lessons=7,duration=60)
+        fourth_booking.save()
+        response = self.client.get(reverse('delete-booking', args=[None]))
+        self.assertEquals(response.status_code, 200)
+        self.assertEqual(Lesson.objects.count(), 2)
+        self.assertEqual(Schedule.objects.count(), 2)
+        self.assertTemplateUsed(response, 'admin_lessons.html')
