@@ -9,9 +9,9 @@ class TestViews(TestCase):
         self.client = Client()
         self.email = 'dummy@example.com'
         self.password = 'Password123'
-        self.admin = True
         user = User.objects.create(email=self.email)
         user.set_password(self.password)
+        user.is_staff=True
         user.save()
         self.client.login(email=self.email, password=self.password)
         
@@ -23,12 +23,12 @@ class TestViews(TestCase):
             
     def test_view_term_dates_get(self):
         response = self.client.get(reverse('edit_term_dates', args=[1]))
-        self.assertEquals(response.status_code, 302)
+        self.assertEquals(response.status_code, 200)
         
     def test_view_term_dates_post(self):
         response = self.client.post(reverse('edit_term_dates', args=[1]),{
         'start_date':'2022-01-01',
         'end_date':'2022-12-31'
         })
-        self.assertEquals(response.status_code, 302)
+        self.assertEquals(response.status_code, 200)
         
