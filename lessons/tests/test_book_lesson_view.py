@@ -17,22 +17,46 @@ class TestViews(TestCase):
         user.save()
         self.client.login(email=self.email, password=self.password)
 
-        self.student=User.objects.create(email='john@kcl.ac.uk')
-        self.student.set_password(self.password)
-        self.student.save()
+        student = User.objects.create_user(
+            email = 'john.doe@example.org',
+            first_name='John',
+            last_name = 'Doe',
+            password = 'Password123',
+        )
+        student.save()
 
         term = TermDates.objects.create(name = 'test', start_date=date(2022,1,1), end_date=date(2022,12,31))
         term.save()
 
-        lesson = Lesson.objects.create(term=TermDates.objects.first(), lessons = 1, desiredInterval = 7, duration = 30, furtherInfo="I want to learn piano", id = 1, user = self.student, children = None)
+        lesson = Lesson.objects.create(
+            lessons=2,
+            desiredInterval=7,
+            duration=30,
+            furtherInfo="I want to learn piano",
+            user=student
+        )
         lesson.save()
+        valid_lesson_pk = Lesson.objects.all()[0].pk
 
-        self.teacher = User.objects.create(email='teacher@test.com')
-        self.teacher.is_teacher = True
-        self.teacher.first_name = 'test'
-        self.teacher.last_name = 'test'
-        self.teacher.outstanding_balance = 0
-        self.teacher.save()
+        teacher = User.objects.create_user(
+            email="dwayne.johnson@example.org",
+            password="Password123",
+            first_name="Dwayne",
+            last_name="Johnson",
+            is_teacher=True,
+        )
+        teacher.save()
+        valid_teacher_pk = User.objects.filter(is_teacher=True)[0].pk
+
+        self.form_input = {
+            'teacher': str(valid_teacher_pk),
+            'lesson': str(valid_lesson_pk),
+            'start_time':time(22,12,00),
+            'start_date':date(2023, 6, 1),
+            'interval':7,
+            'number_of_lessons':7,
+            'duration': 45
+        }
 
 
     def test_book_lesson(self):
@@ -40,14 +64,6 @@ class TestViews(TestCase):
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'book_lessons.html')
 
-    def test_book_lesson_get(self):
-        response = self.client.post(reverse('book-lesson', args=[1]), {
-            'teacher': self.teacher,
-            'start_time':time(10,12,00),
-            'start_date':date(2022, 6, 1),
-            'interval':7,
-            'number_of_lessons':2,
-            'duration': 30
-        })
+    def test_book_lesson_post(self):
+        response = self.client.post(reverse('book-lesson', args=[1]), self.form_input, follow=True)
         self.assertEquals(response.status_code, 200)
-        self.assertTemplateUsed(response, 'book_lessons.html')
