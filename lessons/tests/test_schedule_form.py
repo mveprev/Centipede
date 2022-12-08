@@ -2,6 +2,7 @@ from django import forms
 from django.test import TestCase
 from lessons.forms import ScheduleForm, CustomScheduleForm
 from lessons.models import User, Lesson, Schedule
+from lessons.utils import Calendar
 from datetime import date, time
 
 class ScheduleFormTestCase(TestCase):
@@ -21,8 +22,9 @@ class ScheduleFormTestCase(TestCase):
             last_name="Johnson",
             is_teacher=True,
         )
+        valid_teacher_pk = User.objects.filter(is_teacher=True)[0].pk
         self.form_input = {
-            'teacher': teacher,
+            'teacher': str(valid_teacher_pk),
             'start_time':time(22,12,00),
             'start_date':date(2023, 6, 1),
             'interval':7,
@@ -30,7 +32,7 @@ class ScheduleFormTestCase(TestCase):
             'duration': 45
         }
         self.second_form_input = {
-            'teacher': teacher,
+            'teacher': str(valid_teacher_pk),
             'start_time':time(23,12,00),
             'start_date':date(2023, 6, 1),
             'interval':7,
@@ -128,3 +130,26 @@ class ScheduleFormTestCase(TestCase):
         queryset=User.objects.filter(is_teacher=True)
         customScheduleForm = CustomScheduleForm(queryset=queryset)
         customScheduleForm.label_from_instance(queryset[0])
+
+    def test_calendar_form(self):
+        form = ScheduleForm(data = self.form_input)
+        self.assertTrue(form.is_valid())
+        teacher = User.objects.filter(is_teacher=True)[0]
+        calendar = Calendar(teacher, year=2023, month=6)
+        lesson = Lesson.objects.create(
+            lessons=2,
+            desiredInterval=7,
+            duration=30,
+            furtherInfo="I want to learn piano",
+            user=self.user
+        )
+        schedule = form.save(commit=False)
+        schedule.lesson = lesson
+        schedule.save()
+        second_form = ScheduleForm(data = self.second_form_input)
+        second_schedule = form.save(commit=False)
+        second_schedule.lesson = lesson
+        second_schedule.save()
+        calendar.formatday(1, Schedule.objects)
+        calendar.formatday(0, Schedule.objects)
+        calendar.formatmonth(withyear=True)
